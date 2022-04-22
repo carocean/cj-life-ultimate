@@ -9,26 +9,18 @@
         <version>0.0.1</version>
         <!--        <relativePath/> &lt;!&ndash; lookup parent from repository &ndash;&gt;-->
     </parent>
-    <artifactId>cj-life-ability-api</artifactId>
-    <name>cj-life-ability-api</name>
+    <groupId>cj.life</groupId>
+    <artifactId>cj-life-ability-util</artifactId>
+    <name>cj-life-ability-util</name>
     <packaging>jar</packaging>
-    <!--此处不定义版本将自动以父pom的版本为版本，可以参考spring包的配置-->
-    <description>cj-life-ability-api</description>
+    <description>cj-life-ability-util</description>
     <properties>
         <java.version>1.8</java.version>
-        <cj.life.ability.util.version>0.0.1</cj.life.ability.util.version>
     </properties>
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cj.life</groupId>
-            <artifactId>cj-life-ability-util</artifactId>
-            <version>${cj.life.ability.util.version}</version>
-        </dependency>
+
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -40,4 +32,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

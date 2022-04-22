@@ -16,9 +16,11 @@
     <description>cj-life-ability-swagger</description>
     <properties>
         <java.version>1.8</java.version>
+        <cj.life.ability.util.version>0.0.1</cj.life.ability.util.version>
         <io.swagger.swagger-annotations.version>1.5.14</io.swagger.swagger-annotations.version>
         <io.springfox.springfox-swagger2.version>2.6.1</io.springfox.springfox-swagger2.version>
         <io.springfox.springfox-swagger-ui.version>2.6.1</io.springfox.springfox-swagger-ui.version>
+        <knife4j-spring-boot-starter.version>2.0.9</knife4j-spring-boot-starter.version>
     </properties>
     <dependencies>
         <dependency>
@@ -39,6 +41,18 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
             <version>${io.springfox.springfox-swagger-ui.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.xiaoymin/knife4j-spring-boot-starter -->
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-spring-boot-starter</artifactId>
+            <!--其它版本均有运行时异常，找不到类：ClassPresentInClassPathCondition-->
+            <version>${knife4j-spring-boot-starter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cj.life</groupId>
+            <artifactId>cj-life-ability-util</artifactId>
+            <version>${cj.life.ability.util.version}</version>
         </dependency>
     </dependencies>
 

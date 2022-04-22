@@ -2,6 +2,7 @@ package cj.life.ability.swagger.config;
 
 import cj.life.ability.swagger.SwaggerProperties;
 import cj.life.ability.swagger.SwaggerResponseMsg;
+import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * 使用knife4j替代swagger-ui
+ */
 @Configuration
 @EnableSwagger2
+@EnableKnife4j
 @EnableConfigurationProperties(SwaggerProperties.class)
 @Slf4j
 public class Swagger2Config {
