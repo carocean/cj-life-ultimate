@@ -1,13 +1,20 @@
 package cj.life.ability.swagger.config;
 
+import cj.life.ability.api.annotation.ApiVersion;
 import cj.life.ability.swagger.SwaggerProperties;
 import cj.life.ability.swagger.SwaggerResponseMsg;
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
@@ -21,6 +28,7 @@ import springfox.documentation.spring.web.plugins.ApiSelectorBuilder;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,17 +41,22 @@ import java.util.List;
 @EnableKnife4j
 @EnableConfigurationProperties(SwaggerProperties.class)
 @Slf4j
-public class Swagger2Config {
+public class Swagger2Config implements InitializingBean {
     @Autowired
     private SwaggerProperties swaggerProperties;
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Bean
 //    @ConditionalOnProperty(value = "life.swagger")
     @ConditionalOnMissingBean(Docket.class)
-    public Docket createRestApi() {
+    //默认分组，即所有接口
+    public Docket defaultDocket() {
         log.info(String.format("Swagger2开启状态：%s", swaggerProperties.isEnabled()));
-        ApiSelectorBuilder builder = new Docket(DocumentationType.SWAGGER_2)
-                .groupName(swaggerProperties.getGroupName())
+        String groupName = StringUtils.hasText(swaggerProperties.getDefaultGroupName()) ? swaggerProperties.getDefaultGroupName() : "所有接口";
+        return new Docket(DocumentationType.SWAGGER_2)
+                //由于组在ui中的排名按首字姆排序，所以默认组前缀固定为All排第1
+                .groupName(String.format("All-%s", groupName))
                 //加载配置信息
                 .apiInfo(apiInfo())
                 .enable(swaggerProperties.isEnabled())
@@ -54,19 +67,103 @@ public class Swagger2Config {
                 .globalResponseMessage(RequestMethod.POST, responseBuilder())
                 .globalResponseMessage(RequestMethod.PUT, responseBuilder())
                 .globalResponseMessage(RequestMethod.DELETE, responseBuilder())
-                .select();
-
-        //加载swagger 扫描包
-        builder.apis(RequestHandlerSelectors.withClassAnnotation(Api.class));
-        if (!StringUtils.hasText(swaggerProperties.getBasePackage())) {
-            builder.apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()));
-        }
-
-        return builder.paths(PathSelectors.any()).build()
+                .select()
+                .apis(RequestHandlerSelectors.withClassAnnotation(Api.class))
+                .apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))
+                .paths(PathSelectors.any())
+                .build()
                 //设置安全认证
                 .securityContexts(securityContexts())
                 .securitySchemes(securitySchemes());
+
     }
+
+    private Docket buildDocket(String groupName, int version) {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .apiInfo(apiInfo())
+                .groupName(groupName)
+                .enable(swaggerProperties.isEnabled())
+                //设置全局参数
+                .globalOperationParameters(globalParamBuilder())
+                //设置全局响应参数
+                .globalResponseMessage(RequestMethod.GET, responseBuilder())
+                .globalResponseMessage(RequestMethod.POST, responseBuilder())
+                .globalResponseMessage(RequestMethod.PUT, responseBuilder())
+                .globalResponseMessage(RequestMethod.DELETE, responseBuilder())
+                .select()
+                .apis(method -> {
+                    // 每个方法会进入这里进行判断并归类到不同分组，**请不要调换下面两段代码的顺序，在方法上的注解有优先级**
+
+                    // 该方法上标注了版本
+                    if (method.isAnnotatedWith(ApiVersion.class)) {
+                        ApiVersion apiVersion = method.getHandlerMethod().getMethodAnnotation(ApiVersion.class);
+                        if (apiVersion.value() == version) {
+                            return true;
+                        }
+                    }
+
+                    // 方法所在的类是否标注了?
+                    ApiVersion annotationOnClass = method.getHandlerMethod().getBeanType().getAnnotation(ApiVersion.class);
+                    if (annotationOnClass != null) {
+                        if (annotationOnClass.value() == version) {
+                            return true;
+                        }
+                    }
+                    return false;
+                })
+                .paths(PathSelectors.any())
+                .build() //设置安全认证
+                .securityContexts(securityContexts())
+                .securitySchemes(securitySchemes());
+    }
+
+    /**
+     * 动态得创建Docket bean
+     *
+     * @throws Exception
+     */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+//        doDefaultDocket();//不用动态创建默认组，没必要。
+        doBuildDocket();
+    }
+
+    /*
+    //如果开启，则需要将defaultDocker()方法改为private，方法注解去掉
+        private void doDefaultDocket() {
+            // 动态注入bean
+            AutowireCapableBeanFactory autowireCapableBeanFactory = applicationContext.getAutowireCapableBeanFactory();
+            if (autowireCapableBeanFactory instanceof DefaultListableBeanFactory) {
+                DefaultListableBeanFactory capableBeanFactory = (DefaultListableBeanFactory) autowireCapableBeanFactory;
+                AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder
+                        .genericBeanDefinition()
+                        .setFactoryMethodOnBean("defaultDocket", "swagger2Config")
+                        .getBeanDefinition();
+                capableBeanFactory.registerBeanDefinition("#swaggerDefault", beanDefinition);
+
+            }
+        }
+     */
+    private void doBuildDocket() {
+        // 动态注入bean
+        AutowireCapableBeanFactory autowireCapableBeanFactory = applicationContext.getAutowireCapableBeanFactory();
+        if (autowireCapableBeanFactory instanceof DefaultListableBeanFactory) {
+            DefaultListableBeanFactory capableBeanFactory = (DefaultListableBeanFactory) autowireCapableBeanFactory;
+            int maxVersion = swaggerProperties.getMaxVersion();
+            for (int i = 0; i < maxVersion; i++) {
+                // 要注意 "工厂名和方法名"，意思是用这个bean的指定方法创建docket
+                int currVersion = i + 1;
+                AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder
+                        .genericBeanDefinition()
+                        .setFactoryMethodOnBean("buildDocket", "swagger2Config")
+                        .addConstructorArgValue(String.format("版本_%s", currVersion))
+                        .addConstructorArgValue(currVersion)
+                        .getBeanDefinition();
+                capableBeanFactory.registerBeanDefinition(String.format("#swaggerVersion%s", currVersion), beanDefinition);
+            }
+        }
+    }
+
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()

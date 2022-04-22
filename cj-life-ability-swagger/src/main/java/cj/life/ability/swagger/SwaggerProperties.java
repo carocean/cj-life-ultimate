@@ -6,8 +6,9 @@ import java.util.List;
 
 @ConfigurationProperties("life.swagger")
 public class SwaggerProperties {
-    String groupName;
+    String defaultGroupName;
     private boolean enabled = false;
+    int maxVersion=1;
     private String basePackage;
     private ApiInfoProperties apiInfo;
     private List<SwaggerResponseMsg> responseMsg;
@@ -20,12 +21,20 @@ public class SwaggerProperties {
         this.responseMsg = responseMsg;
     }
 
-    public String getGroupName() {
-        return groupName;
+    public int getMaxVersion() {
+        return maxVersion;
     }
 
-    public void setGroupName(String groupName) {
-        this.groupName = groupName;
+    public void setMaxVersion(int maxVersion) {
+        this.maxVersion = maxVersion;
+    }
+
+    public String getDefaultGroupName() {
+        return defaultGroupName;
+    }
+
+    public void setDefaultGroupName(String defaultGroupName) {
+        this.defaultGroupName = defaultGroupName;
     }
 
     public boolean isEnabled() {
