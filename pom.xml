@@ -37,6 +37,7 @@
         <module>cj-life-ability-util</module>
         <module>cj-life-ability-api</module>
         <module>cj-life-ability-swagger</module>
+        <module>cj-life-ability-eureka</module>
     </modules>
     <dependencies>
         <dependency>
