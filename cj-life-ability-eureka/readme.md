@@ -1,1 +1,0 @@
-# 调用者feign只认spring.application.name，不认eureka.instance.appname配置应用名
