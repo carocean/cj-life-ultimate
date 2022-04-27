@@ -38,6 +38,7 @@
         <module>cj-life-ability-api</module>
         <module>cj-life-ability-swagger</module>
         <module>cj-life-ability-eureka</module>
+        <module>cj-life-ability-feign</module>
     </modules>
     <dependencies>
         <dependency>
