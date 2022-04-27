@@ -186,8 +186,8 @@ public class Swagger2Config implements InitializingBean {
      *
      * @return
      */
-    private List<ApiKey> securitySchemes() {
-        List<ApiKey> list = new ArrayList<>();
+    private List<SecurityScheme> securitySchemes() {
+        List<SecurityScheme> list = new ArrayList<>();
         list.add(new ApiKey("token", "token", "header"));
         return list;
     }

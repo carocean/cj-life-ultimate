@@ -16,19 +16,21 @@
     <description>cj-life-ability-feign</description>
     <properties>
         <java.version>1.8</java.version>
+        <spring-cloud-starter-openfeign-version>3.1.1</spring-cloud-starter-openfeign-version>
+        <spring-cloud-starter-netflix-eureka-client-version>3.1.1</spring-cloud-starter-netflix-eureka-client-version>
     </properties>
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-openfeign -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
-            <version>3.1.1</version>
+            <version>${spring-cloud-starter-openfeign-version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-netflix-eureka-client -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-            <version>3.1.1</version>
+            <version>${spring-cloud-starter-netflix-eureka-client-version}</version>
         </dependency>
     </dependencies>
     <build>
