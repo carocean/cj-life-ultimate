@@ -11,7 +11,6 @@
     </parent>
     <groupId>cj.life</groupId>
     <artifactId>cj-life-ability-feign</artifactId>
-    <packaging>pom</packaging>
     <name>cj-life-ability-feign</name>
     <description>cj-life-ability-feign</description>
     <properties>

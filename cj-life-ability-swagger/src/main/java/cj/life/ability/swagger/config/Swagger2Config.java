@@ -1,9 +1,7 @@
 package cj.life.ability.swagger.config;
 
-import cj.life.ability.api.annotation.ApiVersion;
 import cj.life.ability.swagger.SwaggerProperties;
 import cj.life.ability.swagger.SwaggerResponseMsg;
-import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
@@ -18,27 +16,27 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.builders.*;
 import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
-import springfox.documentation.spring.web.plugins.ApiSelectorBuilder;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 使用knife4j替代swagger-ui
  */
 @Configuration
 @EnableSwagger2
-@EnableKnife4j
+//@EnableKnife4j
 @EnableConfigurationProperties(SwaggerProperties.class)
 @Slf4j
 public class Swagger2Config implements InitializingBean {
@@ -46,6 +44,7 @@ public class Swagger2Config implements InitializingBean {
     private SwaggerProperties swaggerProperties;
     @Autowired
     private ApplicationContext applicationContext;
+    private Pattern apiVersionPattern;
 
     @Bean
 //    @ConditionalOnProperty(value = "life.swagger")
@@ -92,23 +91,18 @@ public class Swagger2Config implements InitializingBean {
                 .globalResponseMessage(RequestMethod.DELETE, responseBuilder())
                 .select()
                 .apis(method -> {
-                    // 每个方法会进入这里进行判断并归类到不同分组，**请不要调换下面两段代码的顺序，在方法上的注解有优先级**
-
-                    // 该方法上标注了版本
-                    if (method.isAnnotatedWith(ApiVersion.class)) {
-                        ApiVersion apiVersion = method.getHandlerMethod().getMethodAnnotation(ApiVersion.class);
-                        if (apiVersion.value() == version) {
-                            return true;
-                        }
-                    }
-
                     // 方法所在的类是否标注了?
-                    ApiVersion annotationOnClass = method.getHandlerMethod().getBeanType().getAnnotation(ApiVersion.class);
-                    if (annotationOnClass != null) {
-                        if (annotationOnClass.value() == version) {
-                            return true;
-                        }
+                    RequestMapping apiMapping = method.getHandlerMethod().getBeanType().getAnnotation(RequestMapping.class);
+                    if (apiMapping != null) {
+                        return matchApiMapping(version, apiMapping.value(), apiMapping.path());
                     }
+                    // 每个方法会进入这里进行判断并归类到不同分组，**请不要调换下面两段代码的顺序，在方法上的注解有优先级**
+                    // 该方法上标注了版本
+                    if (method.isAnnotatedWith(RequestMapping.class)) {
+                        apiMapping = method.getHandlerMethod().getMethodAnnotation(RequestMapping.class);
+                        return matchApiMapping(version, apiMapping.value(), apiMapping.path());
+                    }
+
                     return false;
                 })
                 .paths(PathSelectors.any())
@@ -117,6 +111,23 @@ public class Swagger2Config implements InitializingBean {
                 .securitySchemes(securitySchemes());
     }
 
+    private boolean matchApiMapping(int version, String[] mValue, String[] mPath) {
+        String urlMapping = mValue.length < 1 ? "" : mValue[0];
+        if (!StringUtils.hasText(urlMapping)) {
+            urlMapping = mPath.length < 1 ? "" : mPath[0];
+        }
+        Matcher matcher = apiVersionPattern.matcher(urlMapping);
+        if (!matcher.find() || matcher.groupCount() < 1) {
+            return false;
+        }
+        String v = matcher.group(1);
+        if (Integer.valueOf(v) == version) {
+            return true;
+        }
+        return false;
+    }
+
+
     /**
      * 动态得创建Docket bean
      *
@@ -124,8 +135,15 @@ public class Swagger2Config implements InitializingBean {
      */
     @Override
     public void afterPropertiesSet() throws Exception {
+        setApiVersionPattern();
 //        doDefaultDocket();//不用动态创建默认组，没必要。
         doBuildDocket();
+    }
+
+    private void setApiVersionPattern() {
+        String apiVersionPattern = swaggerProperties.getApiVersionPattern();
+        apiVersionPattern = StringUtils.hasText(apiVersionPattern) ? apiVersionPattern : "^/api/v(\\d+)";
+        this.apiVersionPattern = Pattern.compile(apiVersionPattern, Pattern.DOTALL);
     }
 
     /*

@@ -7,11 +7,20 @@ import java.util.List;
 @ConfigurationProperties("life.swagger")
 public class SwaggerProperties {
     String defaultGroupName;
+    String apiVersionPattern;
     private boolean enabled = false;
     int maxVersion=1;
     private String basePackage;
     private ApiInfoProperties apiInfo;
     private List<SwaggerResponseMsg> responseMsg;
+
+    public String getApiVersionPattern() {
+        return apiVersionPattern;
+    }
+
+    public void setApiVersionPattern(String apiVersionPattern) {
+        this.apiVersionPattern = apiVersionPattern;
+    }
 
     public List<SwaggerResponseMsg> getResponseMsg() {
         return responseMsg;
