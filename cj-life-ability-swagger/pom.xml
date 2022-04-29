@@ -17,11 +17,12 @@
     <properties>
         <java.version>1.8</java.version>
         <cj.life.ability.util.version>0.0.1</cj.life.ability.util.version>
-        <io.swagger.swagger-annotations.version>1.6.6</io.swagger.swagger-annotations.version>
-        <io.springfox.springfox-swagger2.version>2.9.2</io.springfox.springfox-swagger2.version>
-        <io.springfox.springfox-swagger-ui.version>2.9.2</io.springfox.springfox-swagger-ui.version>
+        <!--2.9.2稳定但与feign冲突-->
+        <io.springfox.springfox-swagger2.version>3.0.0</io.springfox.springfox-swagger2.version>
+        <io.springfox.springfox-swagger-ui.version>3.0.0</io.springfox.springfox-swagger-ui.version>
+        <springfox-boot-starter-version>3.0.0</springfox-boot-starter-version>
         <!--2.0.9能适配openfeign3.1.1版本，其它版本均有运行时异常，找不到类：ClassPresentInClassPathCondition-->
-<!--        <knife4j-spring-boot-starter.version>3.0.3</knife4j-spring-boot-starter.version>-->
+        <knife4j-spring-boot-starter.version>3.0.3</knife4j-spring-boot-starter.version>
     </properties>
     <dependencies>
         <dependency>
@@ -30,29 +31,26 @@
             <version>${cj.life.ability.util.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-annotations</artifactId>
-            <version>${io.swagger.swagger-annotations.version}</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger2 -->
-        <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
             <version>${io.springfox.springfox-swagger2.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui -->
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
             <version>${io.springfox.springfox-swagger-ui.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-boot-starter</artifactId>
+            <version>${springfox-boot-starter-version}</version>
+        </dependency>
         <!--这玩意与openfeign冲突，故去除 -->
-<!--        <dependency>-->
-<!--            <groupId>com.github.xiaoymin</groupId>-->
-<!--            <artifactId>knife4j-spring-boot-starter</artifactId>-->
-<!--            &lt;!&ndash;其它版本均有运行时异常，找不到类：ClassPresentInClassPathCondition&ndash;&gt;-->
-<!--            <version>${knife4j-spring-boot-starter.version}</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-spring-boot-starter</artifactId>
+            <version>${knife4j-spring-boot-starter.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

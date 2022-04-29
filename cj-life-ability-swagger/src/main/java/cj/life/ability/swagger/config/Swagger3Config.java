@@ -2,6 +2,7 @@ package cj.life.ability.swagger.config;
 
 import cj.life.ability.swagger.SwaggerProperties;
 import cj.life.ability.swagger.SwaggerResponseMsg;
+import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
@@ -15,15 +16,15 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
 import springfox.documentation.builders.*;
-import springfox.documentation.schema.ModelRef;
+import springfox.documentation.oas.annotations.EnableOpenApi;
 import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,11 +36,11 @@ import java.util.regex.Pattern;
  * 使用knife4j替代swagger-ui
  */
 @Configuration
-@EnableSwagger2
-//@EnableKnife4j
+@EnableOpenApi
+@EnableKnife4j
 @EnableConfigurationProperties(SwaggerProperties.class)
 @Slf4j
-public class Swagger2Config implements InitializingBean {
+public class Swagger3Config implements InitializingBean {
     @Autowired
     private SwaggerProperties swaggerProperties;
     @Autowired
@@ -47,25 +48,24 @@ public class Swagger2Config implements InitializingBean {
     private Pattern apiVersionPattern;
 
     @Bean
-//    @ConditionalOnProperty(value = "life.swagger")
     @ConditionalOnMissingBean(Docket.class)
     //默认分组，即所有接口
     public Docket defaultDocket() {
-        log.info(String.format("Swagger2开启状态：%s", swaggerProperties.isEnabled()));
+        log.info(String.format("Swagger3状态：%s", swaggerProperties.isEnabled()));
         String groupName = StringUtils.hasText(swaggerProperties.getDefaultGroupName()) ? swaggerProperties.getDefaultGroupName() : "所有接口";
-        return new Docket(DocumentationType.SWAGGER_2)
+        return new Docket(DocumentationType.OAS_30)
                 //由于组在ui中的排名按首字姆排序，所以默认组前缀固定为All排第1
                 .groupName(String.format("All-%s", groupName))
                 //加载配置信息
                 .apiInfo(apiInfo())
                 .enable(swaggerProperties.isEnabled())
                 //设置全局参数
-                .globalOperationParameters(globalParamBuilder())
+                .globalRequestParameters(globalParamBuilder())
                 //设置全局响应参数
-                .globalResponseMessage(RequestMethod.GET, responseBuilder())
-                .globalResponseMessage(RequestMethod.POST, responseBuilder())
-                .globalResponseMessage(RequestMethod.PUT, responseBuilder())
-                .globalResponseMessage(RequestMethod.DELETE, responseBuilder())
+                .globalResponses(HttpMethod.GET, responseBuilder())
+                .globalResponses(HttpMethod.POST, responseBuilder())
+                .globalResponses(HttpMethod.PUT, responseBuilder())
+                .globalResponses(HttpMethod.DELETE, responseBuilder())
                 .select()
                 .apis(RequestHandlerSelectors.withClassAnnotation(Api.class))
                 .apis(RequestHandlerSelectors.basePackage(swaggerProperties.getBasePackage()))
@@ -78,17 +78,17 @@ public class Swagger2Config implements InitializingBean {
     }
 
     private Docket buildDocket(String groupName, int version) {
-        return new Docket(DocumentationType.SWAGGER_2)
+        return new Docket(DocumentationType.OAS_30)
                 .apiInfo(apiInfo())
                 .groupName(groupName)
                 .enable(swaggerProperties.isEnabled())
                 //设置全局参数
-                .globalOperationParameters(globalParamBuilder())
+                .globalRequestParameters(globalParamBuilder())
                 //设置全局响应参数
-                .globalResponseMessage(RequestMethod.GET, responseBuilder())
-                .globalResponseMessage(RequestMethod.POST, responseBuilder())
-                .globalResponseMessage(RequestMethod.PUT, responseBuilder())
-                .globalResponseMessage(RequestMethod.DELETE, responseBuilder())
+                .globalResponses(HttpMethod.GET, responseBuilder())
+                .globalResponses(HttpMethod.POST, responseBuilder())
+                .globalResponses(HttpMethod.PUT, responseBuilder())
+                .globalResponses(HttpMethod.DELETE, responseBuilder())
                 .select()
                 .apis(method -> {
                     // 方法所在的类是否标注了?
@@ -135,7 +135,9 @@ public class Swagger2Config implements InitializingBean {
      */
     @Override
     public void afterPropertiesSet() throws Exception {
-        setApiVersionPattern();
+        if (!swaggerProperties.isEnabled()) {
+            return;
+        }
 //        doDefaultDocket();//不用动态创建默认组，没必要。
         doBuildDocket();
     }
@@ -163,6 +165,7 @@ public class Swagger2Config implements InitializingBean {
         }
      */
     private void doBuildDocket() {
+        setApiVersionPattern();
         // 动态注入bean
         AutowireCapableBeanFactory autowireCapableBeanFactory = applicationContext.getAutowireCapableBeanFactory();
         if (autowireCapableBeanFactory instanceof DefaultListableBeanFactory) {
@@ -173,7 +176,7 @@ public class Swagger2Config implements InitializingBean {
                 int currVersion = i + 1;
                 AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder
                         .genericBeanDefinition()
-                        .setFactoryMethodOnBean("buildDocket", "swagger2Config")
+                        .setFactoryMethodOnBean("buildDocket", "swagger3Config")
                         .addConstructorArgValue(String.format("版本_%s", currVersion))
                         .addConstructorArgValue(currVersion)
                         .getBeanDefinition();
@@ -220,12 +223,11 @@ public class Swagger2Config implements InitializingBean {
      *
      * @return
      */
-    private List<Parameter> globalParamBuilder() {
-        List<Parameter> pars = new ArrayList<>();
+    private List<RequestParameter> globalParamBuilder() {
+        List<RequestParameter> pars = new ArrayList<>();
         pars.add(parameterBuilder(
                 "token",
                 "令牌",
-                "string",
                 "header",
                 false)
                 .build());
@@ -237,13 +239,12 @@ public class Swagger2Config implements InitializingBean {
      *
      * @return
      */
-    private ParameterBuilder parameterBuilder(String name, String desc, String type, String parameterType, boolean required) {
-        ParameterBuilder tokenPar = new ParameterBuilder();
+    private RequestParameterBuilder parameterBuilder(String name, String desc, String parameterType, boolean required) {
+        RequestParameterBuilder tokenPar = new RequestParameterBuilder();
         tokenPar
                 .name(name)
                 .description(desc)
-                .modelRef(new ModelRef(type))
-                .parameterType(parameterType)
+                .in(parameterType)
                 .required(required)
                 .build();
         return tokenPar;
@@ -254,16 +255,16 @@ public class Swagger2Config implements InitializingBean {
      *
      * @return
      */
-    private List<ResponseMessage> responseBuilder() {
+    private List<Response> responseBuilder() {
         List<SwaggerResponseMsg> msgList = swaggerProperties.getResponseMsg();
         if (msgList == null) {
             return Arrays.asList();
         }
-        List<ResponseMessage> responseMessageList = new ArrayList<>();
+        List<Response> responseMessageList = new ArrayList<>();
         for (SwaggerResponseMsg msg : msgList) {
-            responseMessageList.add(new ResponseMessageBuilder()
-                    .code(msg.getCode())
-                    .message(msg.getMessage())
+            responseMessageList.add(new ResponseBuilder()
+                    .code(msg.getCode() + "")
+                    .description(msg.getMessage())
                     .build());
         }
         return responseMessageList;
