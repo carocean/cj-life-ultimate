@@ -15,14 +15,12 @@
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <spring-cloud-starter-netflix-eureka-client.version>3.1.1</spring-cloud-starter-netflix-eureka-client.version>
     </properties>
     <dependencies>
         <!-- Eureka 客户端的依赖 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-            <version>${spring-cloud-starter-netflix-eureka-client.version}</version>
         </dependency>
     </dependencies>
     <build>

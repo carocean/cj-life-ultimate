@@ -21,6 +21,7 @@
         <io.springfox.springfox-swagger2.version>2.6.1</io.springfox.springfox-swagger2.version>
         <io.springfox.springfox-swagger-ui.version>2.6.1</io.springfox.springfox-swagger-ui.version>
         <org.aspectj.version>1.9.9.1</org.aspectj.version>
+        <spring-cloud.version>2021.0.2</spring-cloud.version>
     </properties>
     <!--用于根据环境切换属性。如部署时：deploy -P release此时会选择配置的release环境的属性-->
     <profiles>
@@ -61,7 +62,17 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <build>
         <plugins>
             <plugin>
