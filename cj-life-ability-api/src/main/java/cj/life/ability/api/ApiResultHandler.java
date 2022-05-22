@@ -44,7 +44,7 @@ public class ApiResultHandler implements ResponseBodyAdvice<Object> {
                                   Class<? extends HttpMessageConverter<?>> arg3, ServerHttpRequest arg4, ServerHttpResponse arg5) {
         if (body instanceof ErrorResult) {
             ErrorResult error = (ErrorResult) body;
-            return R.fail(error.getCode(), error.getMessage(), error.getException());
+            return R.of(error.getCode(), error.getMessage(), error.getException());
         } else if (body instanceof R) {
             return (R) body;
         } else {
@@ -54,11 +54,11 @@ public class ApiResultHandler implements ResponseBodyAdvice<Object> {
                 httpHeaders.set("Access-Control-Allow-Origin", "*");
                 httpHeaders.set("Content-Type", "application/json;charset=UTF-8");
                 try {
-                    return new ObjectMapper().writeValueAsString(R.success(body));
+                    return new ObjectMapper().writeValueAsString(R.of(ResultCode.SUCCESS,body));
                 } catch (JsonProcessingException e) {
                 }
             }
         }
-        return R.success(body);
+        return R.of(ResultCode.SUCCESS,body);
     }
 }
