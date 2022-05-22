@@ -21,24 +21,24 @@ public class DefaultAuthManagerHandler implements ReactiveAuthorizationManager<A
         String requestUrl = request.getPath().pathWithinApplication().value();
         //这里可以根据requestUrl查询redis，或者数据库得到requestUrl所需的角色，放入roles中
        List<String> roles = new ArrayList<>();
-        if (antPathMatcher.match("/resource/admin/**",requestUrl)){
-            roles.add("ROLE_admin");
-        }else {
-            roles.add("ROLE_common");
-        }
-        roles.add("ROLE_admin");
+//        if (antPathMatcher.match("/resource/admin/**",requestUrl)){
+//            roles.add("ROLE_admin");
+//        }else {
+//            roles.add("ROLE_common");
+//        }
+//        roles.add("ROLE_admin");
         return authentication
                 .filter(a -> a.isAuthenticated())
                 .flatMapIterable(a -> a.getAuthorities())
                 .map(g -> g.getAuthority())
                 .any(c -> {
-                    if (roles.contains(String.valueOf(c))) {
-                        return true;
-                    }
-                    return false;
+//                    if (roles.contains(String.valueOf(c))) {
+//                        return true;
+//                    }
+                    return true;
                 })
                 .map(hasAuthority -> new AuthorizationDecision(hasAuthority))
-                .defaultIfEmpty(new AuthorizationDecision(false));
+                .defaultIfEmpty(new AuthorizationDecision(true));
     }
 
     @Override

@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -28,7 +30,7 @@ public class DefaultTokenResource {
     对于自定义的授权类型：不能走认证流程，唯有向/oauth/token请求令牌。
      */
     @GetMapping("/token")
-    public Map<String, Object> token(@RequestParam() String code) throws IOException {
+    public Mono<Map<String, Object>> token(@RequestParam() String code) throws IOException {
         String url = String.format("http://localhost:8080/oauth/token");
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/x-www-form-urlencoded");
@@ -36,29 +38,30 @@ public class DefaultTokenResource {
         HttpEntity<HashMap<String, Object>> request = new HttpEntity(text, headers);
         String json = restTemplate.postForObject(url, request, String.class);
         Map<String, Object> map = new ObjectMapper().readValue(json, HashMap.class);
-        return map;
+        return Mono.just(map);
     }
 
     @GetMapping("/token/sms_code")
-    public void tokenSmsCode(@RequestParam() String grant_type, @RequestParam() String mobile, @RequestParam() String sms_code, @RequestParam() String redirect_uri, @RequestParam() String scope, HttpServletResponse response) throws IOException {
+    public Mono<Void> tokenSmsCode(@RequestParam() String grant_type, @RequestParam() String mobile, @RequestParam() String sms_code, @RequestParam() String redirect_uri, @RequestParam() String scope, HttpServletResponse response) throws IOException {
         String url = String.format("http://localhost:8080/oauth/token");
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/x-www-form-urlencoded");
         String text = String.format("grant_type=%s&mobile=%s&sms_code=%s&scope=%s&client_id=client1&client_secret=client1_secret",
-                 grant_type, mobile,sms_code, scope
+                grant_type, mobile, sms_code, scope
         );
         HttpEntity<HashMap<String, Object>> request = new HttpEntity(text, headers);
         String json = restTemplate.postForObject(url, request, String.class);
         Map<String, Object> responseData = new ObjectMapper().readValue(json, HashMap.class);
         Map<String, Object> map = (Map<String, Object>) responseData.get("data");
-        String rewardUrl=String.format("%s?access_token=%s&refresh_token=%s&expires_in=%s&token_type=%s&scope=%s",
-                redirect_uri,map.get("access_token"),map.get("refresh_token"),map.get("expires_in"),map.get("token_type"),map.get("scope"));
+        String rewardUrl = String.format("%s?access_token=%s&refresh_token=%s&expires_in=%s&token_type=%s&scope=%s",
+                redirect_uri, map.get("access_token"), map.get("refresh_token"), map.get("expires_in"), map.get("token_type"), map.get("scope"));
 
         response.sendRedirect(rewardUrl);
+        return Mono.empty();
     }
 
     @GetMapping("/refresh_token")
-    public Map<String, Object> refreshToken(@RequestParam() String refresh_token) throws IOException {
+    public Mono<Map<String, Object>> refreshToken(@RequestParam() String refresh_token) throws IOException {
         String url = String.format("http://localhost:8080/oauth/token");
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/x-www-form-urlencoded");
@@ -66,6 +69,6 @@ public class DefaultTokenResource {
         HttpEntity<HashMap<String, Object>> request = new HttpEntity(text, headers);
         String json = restTemplate.postForObject(url, request, String.class);
         Map<String, Object> map = new ObjectMapper().readValue(json, HashMap.class);
-        return map;
+        return Mono.just(map);
     }
 }

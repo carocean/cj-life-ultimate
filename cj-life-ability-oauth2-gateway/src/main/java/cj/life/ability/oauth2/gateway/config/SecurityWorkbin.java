@@ -27,6 +27,7 @@ import java.io.IOException;
 public abstract class SecurityWorkbin {
     @Autowired
     private ApplicationContext applicationContext;
+
     @Bean
     public RestTemplate restTemplate() {
         RestTemplate restTemplate = new RestTemplate();
@@ -70,11 +71,6 @@ public abstract class SecurityWorkbin {
         return new DefaultUnauthorizedEntryPoint();
     }
 
-
-    @Bean("customSecurityGlobalFilter")
-    public WebFilter securityGlobalFilter() {
-        return new DefaultSecurityGlobalFilter();
-    }
 
     @Bean("customAuthenticationWebFilter")
     public AuthenticationWebFilter authenticationWebFilter(TokenStore tokenStore) {
