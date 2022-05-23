@@ -28,8 +28,8 @@ public class ResourceServerConfig {
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         http.addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION);
-        http.cors().and().csrf().disable().httpBasic().disable()
-                .logout().logoutSuccessHandler(securityWorkbin.serverLogoutSuccessHandler())
+        http.cors().and().csrf().disable()
+                .logout().logoutUrl("/logout").logoutSuccessHandler(securityWorkbin.serverLogoutSuccessHandler())
                 .and()
                 .exceptionHandling()
                 .accessDeniedHandler(securityWorkbin.accessDeniedHandler())
