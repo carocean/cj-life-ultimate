@@ -4,14 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.ServletServerHttpResponse;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-import reactor.core.publisher.Flux;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +44,8 @@ public class DefaultTokenResource {
     }
 
     @GetMapping("/token/sms_code")
-    public Mono<Void> tokenSmsCode(@RequestParam() String grant_type, @RequestParam() String mobile, @RequestParam() String sms_code, @RequestParam() String redirect_uri, @RequestParam() String scope, HttpServletResponse response) throws IOException {
+    public Mono<Void> tokenSmsCode(@RequestParam() String grant_type, @RequestParam() String mobile, @RequestParam() String sms_code, @RequestParam() String redirect_uri, @RequestParam() String scope, ServerWebExchange exchange) throws IOException {
+        ServerHttpResponse response=exchange.getResponse();
         String url = String.format("http://localhost:8080/oauth/token");
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/x-www-form-urlencoded");
@@ -55,8 +58,8 @@ public class DefaultTokenResource {
         Map<String, Object> map = (Map<String, Object>) responseData.get("data");
         String rewardUrl = String.format("%s?access_token=%s&refresh_token=%s&expires_in=%s&token_type=%s&scope=%s",
                 redirect_uri, map.get("access_token"), map.get("refresh_token"), map.get("expires_in"), map.get("token_type"), map.get("scope"));
-
-        response.sendRedirect(rewardUrl);
+        response.setStatusCode(HttpStatus.FOUND);
+        response.getHeaders().set("Location",rewardUrl);
         return Mono.empty();
     }
 
