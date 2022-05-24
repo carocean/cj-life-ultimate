@@ -41,9 +41,8 @@
         <module>cj-life-ability-swagger</module>
         <module>cj-life-ability-eureka</module>
         <module>cj-life-ability-feign</module>
+        <module>cj-life-ability-oauth2-app</module>
         <module>cj-life-ability-oauth2-server</module>
-        <module>cj-life-ability-oauth2-client</module>
-        <module>cj-life-ability-oauth2-client2</module>
         <module>cj-life-ability-oauth2-common</module>
         <module>cj-life-ability-oauth2-gateway</module>
         <module>cj-life-ability-redis</module>

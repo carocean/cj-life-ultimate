@@ -2,6 +2,7 @@ package cj.life.ability.oauth2.gateway;
 
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
@@ -35,7 +36,14 @@ public class Oauth2AuthSuccessHandler implements ServerAuthenticationSuccessHand
         OAuth2Authentication oauth2Authentication = (OAuth2Authentication)authentication;
         String clientId = oauth2Authentication.getOAuth2Request().getClientId();
         headerValues.add("x-appid", clientId);
-        headerValues.add("x-roles", authentication.getAuthorities().toString());
+        String roles = "";
+        for (GrantedAuthority authority : authentication.getAuthorities()) {
+            roles += String.format("%s,", authority.getAuthority());
+        }
+        if (roles.endsWith(",")) {
+            roles = roles.substring(0, roles.length() - 1);
+        }
+        headerValues.add("x-roles",roles);
 //        String accountType = AuthUtils.getAccountType(oauth2Authentication.getUserAuthentication());
 //        if (StrUtil.isNotEmpty(accountType)) {
 //            headerValues.add(SecurityConstants.ACCOUNT_TYPE_HEADER, accountType);
