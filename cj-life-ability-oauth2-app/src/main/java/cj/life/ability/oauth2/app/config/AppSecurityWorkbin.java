@@ -4,7 +4,7 @@ import cj.life.ability.oauth2.app.AppSecurityFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-public class AppSecurityWorkbin {
+public abstract class AppSecurityWorkbin {
     @Bean("customAppSecurityFilter")
     public OncePerRequestFilter appSecurityFilter() {
         return new AppSecurityFilter();
