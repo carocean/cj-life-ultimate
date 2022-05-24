@@ -2,6 +2,7 @@ package cj.life.ability.oauth2.app.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -12,6 +13,7 @@ import java.util.UUID;
 
 @Configuration
 @ComponentScan({"cj.life.ability.oauth2.app"})
+@ConditionalOnBean({AppSecurityWorkbin.class})
 public class AppSecurityConfig {
     @Autowired(required = false)
     @Qualifier("customAppSecurityFilter")
