@@ -10,9 +10,9 @@
         <!--        <relativePath/> &lt;!&ndash; lookup parent from repository &ndash;&gt;-->
     </parent>
     <groupId>cj.life</groupId>
-    <artifactId>cj-life-ability-oauth2-client2</artifactId>
-    <name>cj-life-ability-oauth2-client2</name>
-    <description>cj-life-ability-oauth2-client2</description>
+    <artifactId>cj-life-ability-oauth2-app</artifactId>
+    <name>cj-life-ability-oauth2-app</name>
+    <description>cj-life-ability-oauth2-app</description>
     <properties>
         <java.version>1.8</java.version>
         <cj-life-ability-oauth2-common.version>0.0.1</cj-life-ability-oauth2-common.version>
