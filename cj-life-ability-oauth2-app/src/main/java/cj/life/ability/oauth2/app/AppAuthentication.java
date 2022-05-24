@@ -8,10 +8,11 @@ import java.util.List;
 
 public class AppAuthentication implements Authentication {
     String principal;
+    String appid;
     List<GrantedAuthority> grantedAuthorityList;
     boolean isAuthenticated;
 
-    public AppAuthentication(String principal, List<GrantedAuthority> grantedAuthorityList, boolean isAuthenticated) {
+    public AppAuthentication(String principal,String appid, List<GrantedAuthority> grantedAuthorityList, boolean isAuthenticated) {
         this.principal = principal;
         this.grantedAuthorityList = grantedAuthorityList;
         this.isAuthenticated = isAuthenticated;
@@ -45,6 +46,14 @@ public class AppAuthentication implements Authentication {
     @Override
     public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
         this.isAuthenticated = isAuthenticated;
+    }
+
+    public String getAppid() {
+        return appid;
+    }
+
+    public void setAppid(String appid) {
+        this.appid = appid;
     }
 
     @Override

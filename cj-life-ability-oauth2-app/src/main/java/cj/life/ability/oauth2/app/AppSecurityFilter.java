@@ -31,6 +31,7 @@ public class AppSecurityFilter extends OncePerRequestFilter {
             return;
         }
         if (ctx == null) {
+            String appid = request.getHeader("x-appid");
             List<GrantedAuthority> authorityList = new ArrayList<>();
             String roles = request.getHeader("x-roles");
             if (StringUtils.hasText(roles)) {
@@ -39,7 +40,7 @@ public class AppSecurityFilter extends OncePerRequestFilter {
                     authorityList.add(new SimpleGrantedAuthority(role));
                 }
             }
-            Authentication authentication = new AppAuthentication(principal, authorityList, true);
+            Authentication authentication = new AppAuthentication(principal,appid, authorityList, true);
             ctx = new SecurityContextImpl(authentication);
             SecurityContextHolder.setContext(ctx);
         }
