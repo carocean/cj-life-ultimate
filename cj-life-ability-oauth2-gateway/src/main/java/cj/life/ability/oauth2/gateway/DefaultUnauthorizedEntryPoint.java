@@ -2,9 +2,12 @@ package cj.life.ability.oauth2.gateway;
 
 import cj.life.ability.api.R;
 import cj.life.ability.api.ResultCode;
+import cj.life.ability.oauth2.common.QueryStringUtils;
+import cj.life.ability.oauth2.gateway.properties.AuthWebInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.springframework.http.MediaType;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.server.ServerAuthenticationEntryPoint;
@@ -13,12 +16,20 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.netty.ByteBufFlux;
 
+import java.util.Map;
+
 public class DefaultUnauthorizedEntryPoint implements ServerAuthenticationEntryPoint {
+    String authWebLoginUrl;
+
+    public DefaultUnauthorizedEntryPoint(AuthWebInfo authWebInfo) {
+        authWebLoginUrl = String.format("%s%s", authWebInfo.getHost(), authWebInfo.getLogin_url());
+    }
 
     @SneakyThrows
     @Override
     public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException e) {
         ServerHttpResponse response = exchange.getResponse();
+//        ServerHttpRequest request = exchange.getRequest();
         response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
         //Authorization:Bearer
         //可以写到8080，由8080告知认证服务器的登录地址，这样应用只需要知道认证后端地址就可以了
@@ -36,9 +47,9 @@ public class DefaultUnauthorizedEntryPoint implements ServerAuthenticationEntryP
         //response_type=code 授权码模式，等同于加上grant_type=authorization_code参数
 //        String url = String.format("http://localhost:8083/login?response_type=token&client_id=client1&redirect_uri=http://localhost:8084%s&scope=all", "/home");
         //留给登录界面来选择授权类型及响应类型
-        String url = String.format("http://localhost:8083/login?client_id=client1&redirect_uri=http://localhost:8084%s&scope=all", "/home");
+//        Map<String, String> params = request.getQueryParams().toSingleValueMap();
         ResultCode rc = ResultCode.UNAUTHORIZED_CLIENT;
-        Object r = R.of(rc, url);
+        Object r = R.of(rc, authWebLoginUrl);//比如客户端web尝试调用api访问网关时未认证被拒，则告知客户端认证web地址，让它去认证，客户端去拼参数
         return response.writeAndFlushWith(Flux.just(ByteBufFlux.just(response.bufferFactory().wrap(new ObjectMapper().writeValueAsString(r).getBytes("UTF-8")))));
     }
 }

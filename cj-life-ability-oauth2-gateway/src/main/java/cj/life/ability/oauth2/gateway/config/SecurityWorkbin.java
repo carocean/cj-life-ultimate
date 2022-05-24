@@ -1,7 +1,10 @@
 package cj.life.ability.oauth2.gateway.config;
 
 import cj.life.ability.oauth2.gateway.*;
+import cj.life.ability.oauth2.gateway.client.DefaultLookupClient;
+import cj.life.ability.oauth2.gateway.properties.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
@@ -10,7 +13,6 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authorization.ReactiveAuthorizationManager;
 import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 import org.springframework.security.oauth2.server.resource.web.server.ServerBearerTokenAuthenticationConverter;
 import org.springframework.security.web.server.ServerAuthenticationEntryPoint;
@@ -20,13 +22,15 @@ import org.springframework.security.web.server.authentication.logout.ServerLogou
 import org.springframework.security.web.server.authorization.AuthorizationContext;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.server.WebFilter;
 
 import java.io.IOException;
 
+@EnableConfigurationProperties(SecurityProperties.class)
 public abstract class SecurityWorkbin {
     @Autowired
     private ApplicationContext applicationContext;
+    @Autowired
+    protected SecurityProperties securityProperties;
 
     @Bean
     public RestTemplate restTemplate() {
@@ -53,7 +57,7 @@ public abstract class SecurityWorkbin {
 
     @Bean("customServerLogoutSuccessHandler")
     public ServerLogoutSuccessHandler serverLogoutSuccessHandler() {
-        return new DefaultLogoutSuccessHandler();
+        return new DefaultLogoutSuccessHandler(securityProperties.getAuth_server());
     }
 
     @Bean("customAuthManagerHandler")
@@ -63,14 +67,18 @@ public abstract class SecurityWorkbin {
 
     @Bean("customAccessDeniedHandler")
     public DefaultAccessDeniedHandler accessDeniedHandler() {
-        return new DefaultAccessDeniedHandler();
+        return new DefaultAccessDeniedHandler(securityProperties.getAuth_web());
     }
 
     @Bean("customAuthenticationEntryPoint")
     public ServerAuthenticationEntryPoint authenticationEntryPoint() {
-        return new DefaultUnauthorizedEntryPoint();
+        return new DefaultUnauthorizedEntryPoint(securityProperties.getAuth_web());
     }
 
+    @Bean
+    public ILookupClient lookupClient() {
+        return new DefaultLookupClient(securityProperties.getClients());
+    }
 
     @Bean("customAuthenticationWebFilter")
     public AuthenticationWebFilter authenticationWebFilter(TokenStore tokenStore) {

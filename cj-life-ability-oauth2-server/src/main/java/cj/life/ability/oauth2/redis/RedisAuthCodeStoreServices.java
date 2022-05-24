@@ -1,6 +1,7 @@
 package cj.life.ability.oauth2.redis;
 
 import cj.life.ability.redis.config.RedisConfig;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -19,6 +20,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 @ConditionalOnBean({RedisConfig.class})
+@Slf4j
 public class RedisAuthCodeStoreServices extends RandomValueAuthorizationCodeServices {
     @Autowired
     private RedisTemplate redisTemplate;
@@ -33,7 +35,7 @@ public class RedisAuthCodeStoreServices extends RandomValueAuthorizationCodeServ
     @Override
     protected void store(String code, OAuth2Authentication authentication) {
         String key = String.format(CODE_KEY, code);
-        System.out.println("保存code：" + code);
+        log.debug("保存code：" + code);
         //保存30分钟
         redisTemplate.opsForValue().set(key, SerializationUtils.serialize(authentication), 30, TimeUnit.MINUTES);
     }
@@ -49,7 +51,7 @@ public class RedisAuthCodeStoreServices extends RandomValueAuthorizationCodeServ
         String key = String.format(CODE_KEY, code);
         Object value = redisTemplate.opsForValue().get(key);
         if (value != null) {
-            System.out.println("删除code：" + code);
+            log.debug("删除code：" + code);
             redisTemplate.delete(key);
             return SerializationUtils.deserialize((byte[]) value);
         }

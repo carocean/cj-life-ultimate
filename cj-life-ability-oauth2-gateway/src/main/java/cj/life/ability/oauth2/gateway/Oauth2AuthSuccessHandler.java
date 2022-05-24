@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
  * Blog: https://zlt2000.gitee.io
  * Github: https://github.com/zlt2000
  */
+//y认证成功之后走这个
 public class Oauth2AuthSuccessHandler implements ServerAuthenticationSuccessHandler {
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication) {
@@ -33,7 +34,7 @@ public class Oauth2AuthSuccessHandler implements ServerAuthenticationSuccessHand
         headerValues.add("x-principal",authentication.getPrincipal()+"");
         OAuth2Authentication oauth2Authentication = (OAuth2Authentication)authentication;
         String clientId = oauth2Authentication.getOAuth2Request().getClientId();
-        headerValues.add("x-tenant_id", clientId);
+        headerValues.add("x-appid", clientId);
         headerValues.add("x-roles", authentication.getAuthorities().toString());
 //        String accountType = AuthUtils.getAccountType(oauth2Authentication.getUserAuthentication());
 //        if (StrUtil.isNotEmpty(accountType)) {

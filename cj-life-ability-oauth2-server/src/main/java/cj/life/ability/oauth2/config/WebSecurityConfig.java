@@ -1,19 +1,22 @@
 package cj.life.ability.oauth2.config;
 
+import cj.life.ability.oauth2.properties.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.DefaultSecurityFilterChain;
+
+import java.util.List;
 
 /**
  * /oauth/authorize:      验证
@@ -27,8 +30,10 @@ import org.springframework.security.web.DefaultSecurityFilterChain;
 @Configuration
 @ComponentScan(basePackages = {"cj.life.ability.oauth2"})
 @ConditionalOnBean({SecurityWorkbin.class})
+@EnableConfigurationProperties(SecurityProperties.class)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
+    @Autowired
+    SecurityProperties securityProperties;
     @Autowired(required = false)
     SecurityWorkbin securityWorkbin;
 
@@ -45,17 +50,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/assets/**", "/css/**", "/images/**");
+        //"/assets/**", "/css/**", "/images/**"
+        List<String> staticResources = securityProperties.getStatic_resources();
+        web.ignoring().antMatchers(staticResources.toArray(new String[0]));
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
+        //"/login", "/oauth/**", "/logout"
+        List<String>whitelist=securityProperties.getWhitelist();
         http.cors().and().csrf().disable().sessionManagement().disable()
                 .exceptionHandling()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/login", "/oauth/**", "/logout").permitAll()
+                .antMatchers(whitelist.toArray(new String[0])).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin().successHandler(securityWorkbin.successAuthentication()).failureHandler(securityWorkbin.failureAuthentication())

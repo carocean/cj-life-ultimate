@@ -1,12 +1,13 @@
 package cj.life.ability.oauth2.config;
 
 import cj.life.ability.oauth2.DefaultWebRequestInterceptor;
+import cj.life.ability.oauth2.properties.SecurityProperties;
 import cj.life.ability.oauth2.filter.DefaultClientCredentialsTokenEndpointFilter;
-import cj.life.ability.oauth2.grant.mobile.SmsCodeTokenGranter;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,6 +34,7 @@ import java.util.UUID;
 @Configuration
 @ComponentScan(basePackages = {"cj.life.ability.oauth2"})
 @ConditionalOnBean({SecurityWorkbin.class})
+@EnableConfigurationProperties(SecurityProperties.class)
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
     @Autowired(required = false)
     SecurityWorkbin securityWorkbin;
@@ -41,7 +43,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Autowired(required = false)
     @Qualifier("customUserDetailsService")
     UserDetailsService userDetailsService;
-
+    @Autowired
+    SecurityProperties securityProperties;
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
 
@@ -63,7 +66,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        HandlerInterceptor interceptor = new DefaultWebRequestInterceptor();
+        HandlerInterceptor interceptor = new DefaultWebRequestInterceptor(securityProperties.getAuth_web());
         endpoints.addInterceptor(interceptor);
         endpoints.authenticationManager(authenticationManager);
         endpoints.userDetailsService(userDetailsService);
