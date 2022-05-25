@@ -15,13 +15,17 @@
     <description>cj-life-ability-oauth2-app</description>
     <properties>
         <java.version>1.8</java.version>
-        <cj-life-ability-oauth2-common.version>0.0.1</cj-life-ability-oauth2-common.version>
+        <cj-life-ability-api.version>0.0.1</cj-life-ability-api.version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>cj.life</groupId>
-            <artifactId>cj-life-ability-oauth2-common</artifactId>
-            <version>${cj-life-ability-oauth2-common.version}</version>
+            <artifactId>cj-life-ability-api</artifactId>
+            <version>${cj-life-ability-api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
         </dependency>
     </dependencies>
 

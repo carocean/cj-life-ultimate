@@ -5,8 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 public abstract class AppSecurityWorkbin {
-    @Bean("customAppSecurityFilter")
-    public OncePerRequestFilter appSecurityFilter() {
+    protected OncePerRequestFilter appSecurityFilter() {
         return new AppSecurityFilter();
     }
 }

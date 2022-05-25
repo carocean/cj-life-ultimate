@@ -16,18 +16,16 @@ import java.util.UUID;
 @ConditionalOnBean({AppSecurityWorkbin.class})
 public class AppSecurityConfig {
     @Autowired(required = false)
-    @Qualifier("customAppSecurityFilter")
-    OncePerRequestFilter appSecurityFilter;
-
-    @Bean
-    public FilterRegistrationBean companyUrlFilterRegister() {
+    AppSecurityWorkbin appSecurityWorkbin;
+    @Bean("lifeAppSecurityFilter")
+    public FilterRegistrationBean securityFilterRegister() {
         FilterRegistrationBean registration = new FilterRegistrationBean();
         //注入过滤器
-        registration.setFilter(appSecurityFilter);
+        registration.setFilter(appSecurityWorkbin.appSecurityFilter());
         //拦截规则
         registration.addUrlPatterns("/*");
         //过滤器名称
-        registration.setName("life-" + UUID.randomUUID().toString());
+        registration.setName("lifeAppSecurityFilter");
         //过滤器顺序
         registration.setOrder(FilterRegistrationBean.HIGHEST_PRECEDENCE);
         return registration;

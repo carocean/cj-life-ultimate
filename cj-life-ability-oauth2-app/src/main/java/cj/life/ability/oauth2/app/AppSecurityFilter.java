@@ -2,7 +2,7 @@ package cj.life.ability.oauth2.app;
 
 import cj.life.ability.api.R;
 import cj.life.ability.api.ResultCode;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,7 +30,7 @@ public class AppSecurityFilter extends OncePerRequestFilter {
             response.getWriter().write(new ObjectMapper().writeValueAsString(R.of(ResultCode.USERNAME_NOT_FOUND, "未经网关鉴权，因此缺少来访用户")));
             return;
         }
-        if (ctx == null) {
+        if (ctx == null||ctx.getAuthentication()==null) {
             String appid = request.getHeader("x-appid");
             List<GrantedAuthority> authorityList = new ArrayList<>();
             String roles = request.getHeader("x-roles");
@@ -41,8 +41,12 @@ public class AppSecurityFilter extends OncePerRequestFilter {
                 }
             }
             Authentication authentication = new AppAuthentication(principal,appid, authorityList, true);
-            ctx = new SecurityContextImpl(authentication);
-            SecurityContextHolder.setContext(ctx);
+            if (ctx == null) {
+                ctx = new SecurityContextImpl(authentication);
+                SecurityContextHolder.setContext(ctx);
+            }else{
+                ctx.setAuthentication(authentication);
+            }
         }
         filterChain.doFilter(request, response);
     }

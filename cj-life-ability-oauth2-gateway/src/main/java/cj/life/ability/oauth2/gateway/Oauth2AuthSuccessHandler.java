@@ -3,6 +3,7 @@ package cj.life.ability.oauth2.gateway;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
@@ -32,7 +33,15 @@ public class Oauth2AuthSuccessHandler implements ServerAuthenticationSuccessHand
 //            headerValues.add(SecurityConstants.USER_ID_HEADER, String.valueOf(user.getId()));
 //            headerValues.add(SecurityConstants.USER_HEADER, user.getUsername());
 //        }
-        headerValues.add("x-principal",authentication.getPrincipal()+"");
+        Object principalObj=authentication.getPrincipal();
+        String x_principal = "";
+        if(principalObj instanceof User){
+            User user = (User) principalObj;
+            x_principal=user.getUsername();
+        }else{
+            x_principal = principalObj + "";
+        }
+        headerValues.add("x-principal",x_principal);
         OAuth2Authentication oauth2Authentication = (OAuth2Authentication)authentication;
         String clientId = oauth2Authentication.getOAuth2Request().getClientId();
         headerValues.add("x-appid", clientId);
