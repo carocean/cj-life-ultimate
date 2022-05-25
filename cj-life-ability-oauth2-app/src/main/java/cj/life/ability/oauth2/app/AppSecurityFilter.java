@@ -30,7 +30,7 @@ public class AppSecurityFilter extends OncePerRequestFilter {
             response.getWriter().write(new ObjectMapper().writeValueAsString(R.of(ResultCode.USERNAME_NOT_FOUND, "未经网关鉴权，因此缺少来访用户")));
             return;
         }
-        if (ctx == null||ctx.getAuthentication()==null) {
+        if (ctx == null || ctx.getAuthentication() == null) {
             String appid = request.getHeader("x-appid");
             List<GrantedAuthority> authorityList = new ArrayList<>();
             String roles = request.getHeader("x-roles");
@@ -40,11 +40,12 @@ public class AppSecurityFilter extends OncePerRequestFilter {
                     authorityList.add(new SimpleGrantedAuthority(role));
                 }
             }
-            Authentication authentication = new AppAuthentication(principal,appid, authorityList, true);
+            Authentication authentication = new AppAuthentication(principal, appid, authorityList, true);
+
             if (ctx == null) {
                 ctx = new SecurityContextImpl(authentication);
                 SecurityContextHolder.setContext(ctx);
-            }else{
+            } else {
                 ctx.setAuthentication(authentication);
             }
         }

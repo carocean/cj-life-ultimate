@@ -15,6 +15,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.util.StringUtils;
@@ -39,6 +40,7 @@ import java.util.regex.Pattern;
 @EnableOpenApi
 @EnableKnife4j
 @EnableConfigurationProperties(SwaggerProperties.class)
+@ComponentScan(basePackages = {"cj.life.ability.swagger"})
 @Slf4j
 public class Swagger3Config implements InitializingBean {
     @Autowired

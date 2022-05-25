@@ -14,6 +14,7 @@ public class AppAuthentication implements Authentication {
 
     public AppAuthentication(String principal,String appid, List<GrantedAuthority> grantedAuthorityList, boolean isAuthenticated) {
         this.principal = principal;
+        this.appid=appid;
         this.grantedAuthorityList = grantedAuthorityList;
         this.isAuthenticated = isAuthenticated;
     }

@@ -1,15 +1,11 @@
 package cj.life.ability.oauth2.app.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.util.UUID;
 
 @Configuration
 @ComponentScan({"cj.life.ability.oauth2.app"})
@@ -30,4 +26,5 @@ public class AppSecurityConfig {
         registration.setOrder(FilterRegistrationBean.HIGHEST_PRECEDENCE);
         return registration;
     }
+
 }

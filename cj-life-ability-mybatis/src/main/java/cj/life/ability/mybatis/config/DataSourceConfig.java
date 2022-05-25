@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ResourceLoader;
@@ -29,6 +30,7 @@ import java.util.Map;
 @Configuration
 @AutoConfigureAfter({MybatisProperties.class, ResourceLoader.class})
 @EnableConfigurationProperties({MybatisProperties.class})
+@ComponentScan(basePackages = {"cj.life.ability.mybatis"})
 public class DataSourceConfig {
 
     MybatisProperties mybatisProperties;
