@@ -24,8 +24,9 @@
             <version>${cj-life-ability-api.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-core</artifactId>
+            <groupId>cj.life</groupId>
+            <artifactId>cj-life-ability-oauth2-common</artifactId>
+            <version>0.0.1</version>
         </dependency>
     </dependencies>
 

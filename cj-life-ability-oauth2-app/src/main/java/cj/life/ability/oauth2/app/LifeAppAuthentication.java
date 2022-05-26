@@ -1,27 +1,27 @@
 package cj.life.ability.oauth2.app;
 
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
-import java.util.List;
 
-public class AppAuthentication implements Authentication {
-    String principal;
-    String appid;
-    List<GrantedAuthority> grantedAuthorityList;
+public class LifeAppAuthentication implements Authentication {
+    LifeAppPrincipal principal;
+    Collection<? extends GrantedAuthority> authorities;
     boolean isAuthenticated;
+    LifeAppAuthenticationDetails details;
 
-    public AppAuthentication(String principal,String appid, List<GrantedAuthority> grantedAuthorityList, boolean isAuthenticated) {
+    public LifeAppAuthentication(LifeAppPrincipal principal, LifeAppAuthenticationDetails details, Collection<? extends GrantedAuthority> authorities) {
         this.principal = principal;
-        this.appid=appid;
-        this.grantedAuthorityList = grantedAuthorityList;
-        this.isAuthenticated = isAuthenticated;
+        this.authorities = authorities;
+        this.details = details;
     }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return grantedAuthorityList;
+        return authorities;
     }
 
     @Override
@@ -31,7 +31,7 @@ public class AppAuthentication implements Authentication {
 
     @Override
     public Object getDetails() {
-        return null;
+        return details;
     }
 
     @Override
@@ -49,16 +49,8 @@ public class AppAuthentication implements Authentication {
         this.isAuthenticated = isAuthenticated;
     }
 
-    public String getAppid() {
-        return appid;
-    }
-
-    public void setAppid(String appid) {
-        this.appid = appid;
-    }
-
     @Override
     public String getName() {
-        return principal;
+        return principal == null ? "" : principal.user;
     }
 }
