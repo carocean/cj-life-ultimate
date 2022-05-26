@@ -37,9 +37,9 @@ public class AppResourceServerConfig extends ResourceServerConfigurerAdapter {
                 .authenticationEntryPoint((request, response, authException) -> {
                     System.out.println("resources-----");
                 }).tokenExtractor((request) -> {
-                    String principal = request.getHeader("x-principal");
-                    if (!StringUtils.hasText(principal)) {
-                        throw new UsernameNotFoundException("x-principal");
+                    String user = request.getHeader("x-user");
+                    if (!StringUtils.hasText(user)) {
+                        throw new UsernameNotFoundException("x-user");
                     }
                     String appid = request.getHeader("x-appid");
                     List<GrantedAuthority> authorityList = new ArrayList<>();
@@ -50,7 +50,8 @@ public class AppResourceServerConfig extends ResourceServerConfigurerAdapter {
                             authorityList.add(new SimpleGrantedAuthority(role));
                         }
                     }
-                    LifeAppPrincipal lifeAppPrincipal = new LifeAppPrincipal(principal, appid, null);
+                    String tenantid = request.getHeader("x-tenantid");
+                    LifeAppPrincipal lifeAppPrincipal = new LifeAppPrincipal(user, appid, tenantid);
                     LifeAppAuthenticationDetails details = new LifeAppAuthenticationDetails(request);
                     Authentication authentication = new LifeAppAuthentication(lifeAppPrincipal,details, authorityList);
                     return authentication;

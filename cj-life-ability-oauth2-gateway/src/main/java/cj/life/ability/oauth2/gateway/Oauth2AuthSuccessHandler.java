@@ -9,8 +9,11 @@ import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+import java.util.Map;
 
 /**
  * 认证成功处理类
@@ -25,26 +28,30 @@ import reactor.core.publisher.Mono;
 public class Oauth2AuthSuccessHandler implements ServerAuthenticationSuccessHandler {
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication) {
+        ServerHttpRequest request = webFilterExchange.getExchange().getRequest();
         MultiValueMap<String, String> headerValues = new LinkedMultiValueMap<>(4);
-        Object principal = authentication.getPrincipal();
-        //客户端模式只返回一个clientId
-//        if (principal instanceof SysUser) {
-//            SysUser user = (SysUser)authentication.getPrincipal();
-//            headerValues.add(SecurityConstants.USER_ID_HEADER, String.valueOf(user.getId()));
-//            headerValues.add(SecurityConstants.USER_HEADER, user.getUsername());
-//        }
-        Object principalObj=authentication.getPrincipal();
+        Object principalObj = authentication.getPrincipal();
         String x_principal = "";
-        if(principalObj instanceof User){
+        //客户端也可自定一个User来安放登录身份
+        if (principalObj instanceof User) {
             User user = (User) principalObj;
-            x_principal=user.getUsername();
-        }else{
+            x_principal = user.getUsername();
+        } else {
             x_principal = principalObj + "";
         }
-        headerValues.add("x-principal",x_principal);
-        OAuth2Authentication oauth2Authentication = (OAuth2Authentication)authentication;
+        headerValues.add("x-user", x_principal);
+        OAuth2Authentication oauth2Authentication = (OAuth2Authentication) authentication;
         String clientId = oauth2Authentication.getOAuth2Request().getClientId();
         headerValues.add("x-appid", clientId);
+
+        Map<String,String> reqHeaders=request.getHeaders().toSingleValueMap();
+        Map<String,String> reqParams=request.getQueryParams().toSingleValueMap();
+        String tenantid = reqHeaders.getOrDefault("tenantid", "");
+        if (!StringUtils.hasText(tenantid)) {
+            tenantid = reqParams.getOrDefault("tenantid", "");
+        }
+        headerValues.set("x-tenantid", tenantid);
+
         String roles = "";
         for (GrantedAuthority authority : authentication.getAuthorities()) {
             roles += String.format("%s,", authority.getAuthority());
@@ -52,7 +59,7 @@ public class Oauth2AuthSuccessHandler implements ServerAuthenticationSuccessHand
         if (roles.endsWith(",")) {
             roles = roles.substring(0, roles.length() - 1);
         }
-        headerValues.add("x-roles",roles);
+        headerValues.add("x-roles", roles);
 //        String accountType = AuthUtils.getAccountType(oauth2Authentication.getUserAuthentication());
 //        if (StrUtil.isNotEmpty(accountType)) {
 //            headerValues.add(SecurityConstants.ACCOUNT_TYPE_HEADER, accountType);
