@@ -5,17 +5,20 @@ import cj.life.ability.api.ResultCode;
 import cj.life.ability.oauth2.DefaultFailureAuthentication;
 import cj.life.ability.oauth2.DefaultLogoutSuccessHandler;
 import cj.life.ability.oauth2.DefaultSuccessAuthentication;
+import cj.life.ability.oauth2.DefaultUnauthorizedEntryPoint;
 import cj.life.ability.oauth2.common.ResultCodeTranslator;
 import cj.life.ability.oauth2.example.ExampleClientDetailsService;
 import cj.life.ability.oauth2.example.ExampleUserDetailsService;
 import cj.life.ability.oauth2.grant.mobile.SmsCodeSecurityConfig;
 import cj.life.ability.oauth2.grant.mobile.SmsCodeTokenGranter;
 import cj.life.ability.oauth2.grant.sys.SysSecurityConfig;
+import cj.life.ability.oauth2.properties.SecurityProperties;
 import cj.life.ability.oauth2.redis.RedisAuthCodeStoreServices;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -44,10 +47,12 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 
 import java.util.Arrays;
 import java.util.List;
-
+@EnableConfigurationProperties(SecurityProperties.class)
 public abstract class SecurityWorkbin {
     @Autowired
     private ApplicationContext applicationContext;
+    @Autowired
+    SecurityProperties securityProperties;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -101,6 +106,11 @@ public abstract class SecurityWorkbin {
             Object obj = R.of(rc, e.getMessage());
             response.getWriter().write(new ObjectMapper().writeValueAsString(obj));
         });
+    }
+
+    @Bean
+    public DefaultUnauthorizedEntryPoint unauthorizedEntryPoint() {
+        return new DefaultUnauthorizedEntryPoint(securityProperties.getAuth_web());
     }
 
     @Bean

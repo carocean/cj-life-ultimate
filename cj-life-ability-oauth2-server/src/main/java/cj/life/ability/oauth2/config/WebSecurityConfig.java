@@ -61,6 +61,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         List<String>whitelist=securityProperties.getWhitelist();
         http.cors().and().csrf().disable().sessionManagement().disable()
                 .exceptionHandling()
+                .authenticationEntryPoint(securityWorkbin.unauthorizedEntryPoint())
                 .and()
                 .authorizeRequests()
                 .antMatchers(whitelist.toArray(new String[0])).permitAll()
