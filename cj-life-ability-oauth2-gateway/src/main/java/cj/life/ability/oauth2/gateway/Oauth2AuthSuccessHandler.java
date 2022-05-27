@@ -44,12 +44,9 @@ public class Oauth2AuthSuccessHandler implements ServerAuthenticationSuccessHand
         String clientId = oauth2Authentication.getOAuth2Request().getClientId();
         headerValues.add("x-appid", clientId);
 
-        Map<String,String> reqHeaders=request.getHeaders().toSingleValueMap();
-        Map<String,String> reqParams=request.getQueryParams().toSingleValueMap();
-        String tenantid = reqHeaders.getOrDefault("tenantid", "");
-        if (!StringUtils.hasText(tenantid)) {
-            tenantid = reqParams.getOrDefault("tenantid", "");
-        }
+        //从认证服务器过来，如果认证服务器通过了租户认证则会有details
+        Map<String, Object> details = (Map<String, Object>) authentication.getDetails();
+        String tenantid = details == null ? "" : (String) details.getOrDefault("tenantid", "");
         headerValues.set("x-tenantid", tenantid);
 
         String roles = "";

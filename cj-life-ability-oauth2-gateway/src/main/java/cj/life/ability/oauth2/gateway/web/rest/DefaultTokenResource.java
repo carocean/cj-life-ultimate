@@ -92,7 +92,7 @@ public class DefaultTokenResource {
         HttpEntity<HashMap<String, Object>> request = new HttpEntity(queryString, headers);
         String json = restTemplate.postForObject(url, request, String.class);
         Map<String, Object> responseData = new ObjectMapper().readValue(json, HashMap.class);
-        if (!isCustomGrantType(params)) {
+        if (!params.containsKey("redirect_uri")||!isCustomGrantType(params)) {
             return Mono.just(responseData);
         }
         ServerHttpResponse response = exchange.getResponse();

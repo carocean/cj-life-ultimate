@@ -1,6 +1,5 @@
 package cj.life.ability.oauth2.grant.tenant;
 
-import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -9,7 +8,9 @@ import org.springframework.security.oauth2.common.exceptions.InvalidGrantExcepti
 import org.springframework.security.oauth2.provider.*;
 import org.springframework.security.oauth2.provider.token.AbstractTokenGranter;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
+import org.springframework.util.StringUtils;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -53,12 +54,17 @@ public class TenantTokenGranter extends AbstractTokenGranter {
         Map<String, String> parameters = new LinkedHashMap<String, String>(tokenRequest.getRequestParameters());
         // 获取参数
         String access_token = parameters.get("access_token");
+        if (!StringUtils.hasText(access_token)) {
+            throw new InvalidGrantException("require parameter access_token");
+        }
         String tenantid = parameters.get("tenantid");
-
+        if (!StringUtils.hasText(tenantid)) {
+            throw new InvalidGrantException("require parameter tenantid");
+        }
         Authentication userAuth = new TenantAuthenticationToken(tenantid, access_token);
-        ((AbstractAuthenticationToken) userAuth).setDetails(parameters);
+        OAuth2Authentication storedAuth = null;
         try {
-            userAuth = authenticationManager.authenticate(userAuth);
+            storedAuth = (OAuth2Authentication) authenticationManager.authenticate(userAuth);
         } catch (AccountStatusException ase) {
             //covers expired, locked, disabled cases (mentioned in section 5.2, draft 31)
             throw new InvalidGrantException(ase.getMessage());
@@ -66,12 +72,18 @@ public class TenantTokenGranter extends AbstractTokenGranter {
             // If the username/password are wrong the spec says we should send 400/invalid grant
             throw new InvalidGrantException(e.getMessage());
         }
-        if (userAuth == null || !userAuth.isAuthenticated()) {
+        if (storedAuth == null || !storedAuth.isAuthenticated()) {
             throw new InvalidGrantException("Could not authenticate tenant: " + tenantid);
         }
-
-        OAuth2Request storedOAuth2Request = getRequestFactory().createOAuth2Request(client, tokenRequest);
-        return new OAuth2Authentication(storedOAuth2Request, userAuth);
+//        Object authDetails = storedAuth.getUserAuthentication().getDetails();
+        Object currDetails=storedAuth.getDetails();
+        if (currDetails == null) {
+            currDetails = new HashMap<>();
+            storedAuth.setDetails(currDetails);
+        }
+        Map<String, Object> details = (Map<String, Object>) currDetails;
+        details.put("tenantid", tenantid);
+        return storedAuth;
     }
 }
 
