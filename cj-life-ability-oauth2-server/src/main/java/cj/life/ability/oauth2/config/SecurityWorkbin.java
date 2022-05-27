@@ -12,6 +12,7 @@ import cj.life.ability.oauth2.example.ExampleUserDetailsService;
 import cj.life.ability.oauth2.grant.mobile.SmsCodeSecurityConfig;
 import cj.life.ability.oauth2.grant.mobile.SmsCodeTokenGranter;
 import cj.life.ability.oauth2.grant.sys.SysSecurityConfig;
+import cj.life.ability.oauth2.grant.tenant.TenantSecurityConfig;
 import cj.life.ability.oauth2.grant.tenant.TenantTokenGranter;
 import cj.life.ability.oauth2.properties.SecurityProperties;
 import cj.life.ability.oauth2.redis.RedisAuthCodeStoreServices;
@@ -131,9 +132,11 @@ public abstract class SecurityWorkbin {
     public List<SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity>> defaultCodeSecurityConfigs() {
         SmsCodeSecurityConfig smsCodeSecurityConfig = applicationContext.getBean(SmsCodeSecurityConfig.class);
         SysSecurityConfig sysSecurityConfig = applicationContext.getBean(SysSecurityConfig.class);
+        TenantSecurityConfig tenantSecurityConfig = applicationContext.getBean(TenantSecurityConfig.class);
         return Arrays.asList(
                 smsCodeSecurityConfig,
-                sysSecurityConfig
+                sysSecurityConfig,
+                tenantSecurityConfig
         );
     }
 

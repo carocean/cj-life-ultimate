@@ -29,7 +29,7 @@ public class ExampleClientDetailsService implements ClientDetailsService {
         //该客户端支持的认证类型："authorization_code", "password", "client_credentials", "implicit", "refresh_token"
         //如果使用authorization_code类型，则必须带上refresh_token类型，因为：令牌过期刷新需要用上refresh_token类型
 
-        clientDetails.setAuthorizedGrantTypes(Arrays.asList("authorization_code", "refresh_token","implicit","sms_code"));
+        clientDetails.setAuthorizedGrantTypes(Arrays.asList("authorization_code", "refresh_token","implicit","sms_code","tenant_code"));
         clientDetails.setScope(Arrays.asList("all", "ROLE_ADMIN", "ROLE_USER"));
         clientDetails.setAutoApproveScopes(Arrays.asList("false"));//false需要用户确认授权才能跳到client_id
         Set<String> set = new HashSet<>();
