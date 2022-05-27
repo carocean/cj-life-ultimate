@@ -12,6 +12,7 @@ import cj.life.ability.oauth2.example.ExampleUserDetailsService;
 import cj.life.ability.oauth2.grant.mobile.SmsCodeSecurityConfig;
 import cj.life.ability.oauth2.grant.mobile.SmsCodeTokenGranter;
 import cj.life.ability.oauth2.grant.sys.SysSecurityConfig;
+import cj.life.ability.oauth2.grant.tenant.TenantTokenGranter;
 import cj.life.ability.oauth2.properties.SecurityProperties;
 import cj.life.ability.oauth2.redis.RedisAuthCodeStoreServices;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -139,7 +140,8 @@ public abstract class SecurityWorkbin {
     @Bean
     public List<AbstractTokenGranter> defaultTokenGranters(AuthenticationManager authenticationManager, AuthorizationServerEndpointsConfigurer endpoints) {
         return Arrays.asList(
-                new SmsCodeTokenGranter(authenticationManager, endpoints.getTokenServices(), endpoints.getClientDetailsService(), endpoints.getOAuth2RequestFactory())
+                new SmsCodeTokenGranter(authenticationManager, endpoints.getTokenServices(), endpoints.getClientDetailsService(), endpoints.getOAuth2RequestFactory()),
+                new TenantTokenGranter(authenticationManager, endpoints.getTokenServices(), endpoints.getClientDetailsService(), endpoints.getOAuth2RequestFactory())
         );
     }
 }
