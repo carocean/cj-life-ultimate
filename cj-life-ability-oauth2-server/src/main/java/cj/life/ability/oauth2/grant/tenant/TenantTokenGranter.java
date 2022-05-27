@@ -24,7 +24,7 @@ import java.util.Map;
  */
 public class TenantTokenGranter extends AbstractTokenGranter {
     // 仅仅复制了 ResourceOwnerPasswordTokenGranter，只是改变了 GRANT_TYPE 的值，来验证自定义授权模式的可行性
-    private static final String GRANT_TYPE = "sms_code";
+    private static final String GRANT_TYPE = "tenant_code";
 
     private final AuthenticationManager authenticationManager;
 
