@@ -28,7 +28,7 @@ import java.util.Map;
 public class Oauth2AuthSuccessHandler implements ServerAuthenticationSuccessHandler {
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication) {
-        ServerHttpRequest request = webFilterExchange.getExchange().getRequest();
+//        ServerHttpRequest request = webFilterExchange.getExchange().getRequest();
         MultiValueMap<String, String> headerValues = new LinkedMultiValueMap<>(4);
         Object principalObj = authentication.getPrincipal();
         String x_principal = "";

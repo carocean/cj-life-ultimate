@@ -14,6 +14,7 @@ import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
+import org.springframework.web.server.WebFilter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,12 +32,16 @@ public class ResourceServerConfig {
     @Autowired(required = false)
     @Qualifier("customAuthenticationWebFilter")
     AuthenticationWebFilter authenticationWebFilter;
+    @Autowired(required = false)
+    @Qualifier("customErrorWebFilter")
+    WebFilter errorWebFilter;
     @Autowired
     SecurityProperties securityProperties;
 
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         //这个filter必须放到前面设置
+        http.addFilterBefore(errorWebFilter, SecurityWebFiltersOrder.FIRST);
         http.addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION);
         List<String> whitelist = securityProperties.getWhitelist();
         List<String> staticResources = securityProperties.getStatic_resources();

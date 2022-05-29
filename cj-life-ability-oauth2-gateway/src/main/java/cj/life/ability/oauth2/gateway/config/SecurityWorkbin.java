@@ -1,8 +1,13 @@
 package cj.life.ability.oauth2.gateway.config;
 
+import cj.life.ability.api.R;
+import cj.life.ability.api.ResultCode;
+import cj.life.ability.oauth2.common.ResultCodeTranslator;
 import cj.life.ability.oauth2.gateway.*;
 import cj.life.ability.oauth2.gateway.client.DefaultLookupClient;
 import cj.life.ability.oauth2.gateway.properties.SecurityProperties;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -10,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authorization.ReactiveAuthorizationManager;
 import org.springframework.security.oauth2.provider.token.TokenStore;
@@ -22,8 +28,14 @@ import org.springframework.security.web.server.authentication.logout.ServerLogou
 import org.springframework.security.web.server.authorization.AuthorizationContext;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.WebFilter;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.netty.ByteBufFlux;
 
+import javax.naming.AuthenticationException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 @EnableConfigurationProperties(SecurityProperties.class)
 public abstract class SecurityWorkbin {
@@ -73,6 +85,29 @@ public abstract class SecurityWorkbin {
     @Bean("customAuthenticationEntryPoint")
     public ServerAuthenticationEntryPoint authenticationEntryPoint() {
         return new DefaultUnauthorizedEntryPoint(securityProperties.getAuth_web());
+    }
+
+    @Bean("customErrorWebFilter")
+    WebFilter errorWebFilter() {
+        return ((exchange, chain) -> {
+            try {
+                return chain.filter(exchange);
+            } catch (Exception e) {
+                ResultCode rc = null;
+                if (e instanceof AuthenticationException) {
+                    rc = ResultCodeTranslator.translateException((org.springframework.security.core.AuthenticationException) e);
+                } else {
+                    rc = ResultCode.ERROR_UNKNOWN;
+                }
+                Object r = R.of(rc, e.getMessage());
+                ServerHttpResponse response = exchange.getResponse();
+                try {
+                    return response.writeAndFlushWith(Flux.just(ByteBufFlux.just(response.bufferFactory().wrap(new ObjectMapper().writeValueAsString(r).getBytes("UTF-8")))));
+                } catch (Exception ex) {
+                    return Mono.empty();
+                }
+            }
+        });
     }
 
     @Bean
