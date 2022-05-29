@@ -17,7 +17,6 @@ import org.springframework.security.web.server.authentication.AuthenticationWebF
 import org.springframework.web.server.WebFilter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Configuration

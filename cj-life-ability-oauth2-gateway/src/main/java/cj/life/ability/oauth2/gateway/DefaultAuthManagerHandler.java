@@ -1,6 +1,5 @@
 package cj.life.ability.oauth2.gateway;
 
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.ReactiveAuthorizationManager;
 import org.springframework.security.core.Authentication;
@@ -8,16 +7,13 @@ import org.springframework.security.web.server.authorization.AuthorizationContex
 import org.springframework.util.AntPathMatcher;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class DefaultAuthManagerHandler implements ReactiveAuthorizationManager<AuthorizationContext> {
 
     private AntPathMatcher antPathMatcher = new AntPathMatcher();
 //自定义地址权限拦截实现
     @Override
     public Mono<AuthorizationDecision> check(Mono<Authentication> authentication, AuthorizationContext object) {
-        ServerHttpRequest request = object.getExchange().getRequest();
+//        ServerHttpRequest request = object.getExchange().getRequest();
 //        String requestUrl = request.getPath().pathWithinApplication().value();
         //这里可以根据requestUrl查询redis，或者数据库得到requestUrl所需的角色，放入roles中
 //       List<String> roles = new ArrayList<>();
