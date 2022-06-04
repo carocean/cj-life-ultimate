@@ -40,7 +40,6 @@ import java.util.regex.Pattern;
 @EnableOpenApi
 @EnableKnife4j
 @EnableConfigurationProperties(SwaggerProperties.class)
-@ComponentScan(basePackages = {"cj.life.ability.swagger"})
 @Slf4j
 public class Swagger3Config implements InitializingBean {
     @Autowired

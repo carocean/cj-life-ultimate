@@ -20,6 +20,7 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -39,7 +40,8 @@ public class AppResourceServerConfig extends ResourceServerConfigurerAdapter {
                 }).tokenExtractor((request) -> {
                     String user = request.getHeader("x-user");
                     if (!StringUtils.hasText(user)) {
-                        throw new UsernameNotFoundException("x-user");
+                        return null;//默认是资源全部开放，包括对swagger资源
+//                        throw new UsernameNotFoundException("x-user");
                     }
                     String appid = request.getHeader("x-appid");
                     List<GrantedAuthority> authorityList = new ArrayList<>();
@@ -65,7 +67,8 @@ public class AppResourceServerConfig extends ResourceServerConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable().logout().disable().formLogin().disable()
-                .authorizeRequests().antMatchers("/**").permitAll()
+                .authorizeRequests()
+                .antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
                 .and().exceptionHandling()
                 .accessDeniedHandler(((request, response, accessDeniedException) -> {
