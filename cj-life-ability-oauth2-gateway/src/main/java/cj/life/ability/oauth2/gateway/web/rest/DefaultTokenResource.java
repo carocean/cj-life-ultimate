@@ -9,24 +9,16 @@ import cj.life.ability.oauth2.gateway.properties.ClientInfo;
 import cj.life.ability.oauth2.gateway.properties.SecurityProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ServerWebExchange;
@@ -41,8 +33,7 @@ import java.util.Map;
  * 获取token一定要client密钥
  */
 @RestController
-@RequestMapping("/api/v1")
-@Api(description = "该类用于客户端web请求令牌，该类作为中介向认证服务器请求")
+@RequestMapping("/")
 public class DefaultTokenResource {
     @Autowired
     RestTemplate restTemplate;
@@ -58,7 +49,6 @@ public class DefaultTokenResource {
     对于自定义的授权类型：不能走认证流程，唯有向/oauth/token请求令牌。
      */
     @GetMapping("/token")
-    @ApiOperation("获取令牌")
     public Mono<Map<String, Object>> token(ServerWebExchange exchange) throws IOException {
         try {
             return doToken(exchange);

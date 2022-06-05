@@ -18,7 +18,6 @@
         <cj-life-ability-api.version>0.0.1</cj-life-ability-api.version>
         <cj-life-ability-oauth2-common.version>0.0.1</cj-life-ability-oauth2-common.version>
         <cj-life-ability-redis.version>0.0.1</cj-life-ability-redis.version>
-        <cj-life-ability-swagger.version>0.0.1</cj-life-ability-swagger.version>
     </properties>
     <dependencies>
         <dependency>
@@ -37,11 +36,6 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-oauth2-resource-server</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cj.life</groupId>
-            <artifactId>cj-life-ability-swagger</artifactId>
-            <version>${cj-life-ability-swagger.version}</version>
         </dependency>
         <dependency>
             <groupId>cj.life</groupId>
