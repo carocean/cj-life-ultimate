@@ -2,6 +2,7 @@ package cj.life.ability.swagger;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @ConfigurationProperties("life.swagger")
@@ -13,6 +14,20 @@ public class SwaggerProperties {
     private String basePackage;
     private ApiInfoProperties apiInfo;
     private List<SwaggerResponseMsg> responseMsg;
+    private SwaggerGlobalParameter tokenParameter;
+    private List<SwaggerGlobalParameter> parameters=new ArrayList<>();
+
+    public List<SwaggerGlobalParameter> getParameters() {
+        return parameters;
+    }
+
+    public SwaggerGlobalParameter getTokenParameter() {
+        return tokenParameter;
+    }
+
+    public void setTokenParameter(SwaggerGlobalParameter tokenParameter) {
+        this.tokenParameter = tokenParameter;
+    }
 
     public String getApiVersionPattern() {
         return apiVersionPattern;

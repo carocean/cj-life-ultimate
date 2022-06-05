@@ -1,5 +1,6 @@
 package cj.life.ability.swagger.config;
 
+import cj.life.ability.swagger.SwaggerGlobalParameter;
 import cj.life.ability.swagger.SwaggerProperties;
 import cj.life.ability.swagger.SwaggerResponseMsg;
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
@@ -209,14 +210,28 @@ public class Swagger3Config implements InitializingBean {
      * @return
      */
     private List<SecurityScheme> securitySchemes() {
+        SwaggerGlobalParameter parameter = swaggerProperties.getTokenParameter();
         List<SecurityScheme> list = new ArrayList<>();
-        list.add(new ApiKey("token", "token", "header"));
+        if (parameter == null) {
+            return list;
+        }
+        list.add(
+                new ApiKey(parameter.getName(), parameter.getName(), parameter.getTokenIn())
+        );
         return list;
     }
 
     private List<SecurityReference> defaultAuth() {
-        AuthorizationScope[] authorizationScopes = new AuthorizationScope[]{new AuthorizationScope("all", "all scope")};
-        return Arrays.asList(new SecurityReference("token", authorizationScopes));
+        SwaggerGlobalParameter parameter = swaggerProperties.getTokenParameter();
+        if (parameter == null) {
+            return new ArrayList<>();
+        }
+        AuthorizationScope[] authorizationScopes = new AuthorizationScope[]{
+                new AuthorizationScope("all", "all scope")
+        };
+        return Arrays.asList(
+                new SecurityReference(parameter.getName(), authorizationScopes)
+        );
     }
 
     /**
@@ -226,12 +241,24 @@ public class Swagger3Config implements InitializingBean {
      */
     private List<RequestParameter> globalParamBuilder() {
         List<RequestParameter> pars = new ArrayList<>();
-        pars.add(parameterBuilder(
-                "token",
-                "令牌",
-                "header",
-                false)
-                .build());
+        SwaggerGlobalParameter tokenParameter = swaggerProperties.getTokenParameter();
+        if (tokenParameter != null) {
+            pars.add(parameterBuilder(
+                    tokenParameter.getName(),
+                    tokenParameter.getDesc(),
+                    tokenParameter.getTokenIn(),
+                    tokenParameter.isRequired())
+                    .build());
+        }
+        List<SwaggerGlobalParameter> parameters = swaggerProperties.getParameters();
+        for (SwaggerGlobalParameter parameter : parameters) {
+            pars.add(parameterBuilder(
+                    parameter.getName(),
+                    parameter.getDesc(),
+                    parameter.getTokenIn(),
+                    parameter.isRequired())
+                    .build());
+        }
         return pars;
     }
 
