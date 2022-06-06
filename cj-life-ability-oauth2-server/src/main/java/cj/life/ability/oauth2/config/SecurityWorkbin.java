@@ -2,13 +2,11 @@ package cj.life.ability.oauth2.config;
 
 import cj.life.ability.api.R;
 import cj.life.ability.api.ResultCode;
-import cj.life.ability.oauth2.DefaultFailureAuthentication;
-import cj.life.ability.oauth2.DefaultLogoutSuccessHandler;
-import cj.life.ability.oauth2.DefaultSuccessAuthentication;
-import cj.life.ability.oauth2.DefaultUnauthorizedEntryPoint;
+import cj.life.ability.oauth2.*;
 import cj.life.ability.oauth2.common.ResultCodeTranslator;
 import cj.life.ability.oauth2.example.ExampleClientDetailsService;
 import cj.life.ability.oauth2.example.ExampleUserDetailsService;
+import cj.life.ability.oauth2.filter.LifeAuthenticationFilter;
 import cj.life.ability.oauth2.grant.mobile.SmsCodeSecurityConfig;
 import cj.life.ability.oauth2.grant.mobile.SmsCodeTokenGranter;
 import cj.life.ability.oauth2.grant.sys.SysSecurityConfig;
@@ -18,8 +16,6 @@ import cj.life.ability.oauth2.properties.SecurityProperties;
 import cj.life.ability.oauth2.redis.RedisAuthCodeStoreServices;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -43,12 +39,12 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.DefaultSecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.*;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 import java.util.Arrays;
 import java.util.List;
+
 @EnableConfigurationProperties(SecurityProperties.class)
 public abstract class SecurityWorkbin {
     @Autowired
@@ -146,5 +142,11 @@ public abstract class SecurityWorkbin {
                 new SmsCodeTokenGranter(authenticationManager, endpoints.getTokenServices(), endpoints.getClientDetailsService(), endpoints.getOAuth2RequestFactory()),
                 new TenantTokenGranter(authenticationManager, endpoints.getTokenServices(), endpoints.getClientDetailsService(), endpoints.getOAuth2RequestFactory())
         );
+    }
+
+    @Bean
+    public AbstractAuthenticationProcessingFilter defaultAuthenticationProcessingFilter(AuthenticationManager authenticationManager) {
+        LifeAuthenticationFilter filter = new LifeAuthenticationFilter(authenticationManager);
+        return filter;
     }
 }

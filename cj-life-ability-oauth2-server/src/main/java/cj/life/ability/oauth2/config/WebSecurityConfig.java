@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.DefaultSecurityFilterChain;
+import org.springframework.security.web.authentication.*;
 
 import java.util.List;
 
@@ -57,8 +58,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        AbstractAuthenticationProcessingFilter filter = securityWorkbin.defaultAuthenticationProcessingFilter(this.authenticationManagerBean());
+        AuthenticationSuccessHandler successHandler=securityWorkbin.successAuthentication();
+        AuthenticationFailureHandler failureHandler=securityWorkbin.failureAuthentication();
+        filter.setAuthenticationSuccessHandler(successHandler);
+        filter.setAuthenticationFailureHandler(failureHandler);
+        http.addFilterAt(filter, UsernamePasswordAuthenticationFilter.class);
         //"/login", "/oauth/**", "/logout"
-        List<String>whitelist=securityProperties.getWhitelist();
+        List<String> whitelist = securityProperties.getWhitelist();
         http.cors().and().csrf().disable().sessionManagement().disable()
                 .exceptionHandling()
                 .authenticationEntryPoint(securityWorkbin.unauthorizedEntryPoint())
@@ -67,7 +74,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(whitelist.toArray(new String[0])).permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .formLogin().successHandler(securityWorkbin.successAuthentication()).failureHandler(securityWorkbin.failureAuthentication())
+                .formLogin().successHandler(successHandler).failureHandler(failureHandler)
                 .and()
                 .logout().logoutSuccessHandler(securityWorkbin.logoutSuccessHandler()).clearAuthentication(true).permitAll()
         ;
