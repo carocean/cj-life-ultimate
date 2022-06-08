@@ -42,7 +42,11 @@ public class GrantTypeAuthenticationFactory implements IGrantTypeAuthenticationF
     public List<SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity>> getSecurityConfigs() {
         List<SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity>> list = new ArrayList<>();
         for (IGrantTypeCombin combin : combins.values()) {
-            list.add(combin.getSecurityConfig());
+            SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> obj=combin.getSecurityConfig();
+            if (obj == null) {
+                continue;
+            }
+            list.add(obj);
         }
         return list;
     }
@@ -51,7 +55,11 @@ public class GrantTypeAuthenticationFactory implements IGrantTypeAuthenticationF
     public List<TokenGranter> getTokenGranters(AuthenticationManager authenticationManager, AuthorizationServerEndpointsConfigurer endpoints) {
         List<TokenGranter> list = new ArrayList<>();
         for (IGrantTypeCombin combin : combins.values()) {
-            list.add(combin.getTokenGranter(authenticationManager,endpoints));
+            TokenGranter tokenGranter =combin.getTokenGranter(authenticationManager,endpoints);
+            if (tokenGranter == null) {
+                continue;
+            }
+            list.add(tokenGranter);
         }
         return list;
     }
