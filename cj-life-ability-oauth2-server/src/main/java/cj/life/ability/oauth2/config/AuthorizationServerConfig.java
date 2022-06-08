@@ -93,7 +93,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     private TokenGranter tokenGranter(final AuthorizationServerEndpointsConfigurer endpoints) {
         List<TokenGranter> granters = new ArrayList<>(Arrays.asList(endpoints.getTokenGranter()));// 获取默认的granter集合
         granters.addAll(
-                securityWorkbin.defaultTokenGranters(authenticationManager,endpoints)
+                securityWorkbin.grantTypeAuthenticationFactory().getTokenGranters(authenticationManager,endpoints)
                 );
         return new CompositeTokenGranter(granters);
     }

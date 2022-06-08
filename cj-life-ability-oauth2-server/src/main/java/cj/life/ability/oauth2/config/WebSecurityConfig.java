@@ -59,8 +59,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         AbstractAuthenticationProcessingFilter filter = securityWorkbin.defaultAuthenticationProcessingFilter(this.authenticationManagerBean());
-        AuthenticationSuccessHandler successHandler=securityWorkbin.successAuthentication();
-        AuthenticationFailureHandler failureHandler=securityWorkbin.failureAuthentication();
+        AuthenticationSuccessHandler successHandler = securityWorkbin.successAuthentication();
+        AuthenticationFailureHandler failureHandler = securityWorkbin.failureAuthentication();
         filter.setAuthenticationSuccessHandler(successHandler);
         filter.setAuthenticationFailureHandler(failureHandler);
         http.addFilterAt(filter, UsernamePasswordAuthenticationFilter.class);
@@ -78,7 +78,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout().logoutSuccessHandler(securityWorkbin.logoutSuccessHandler()).clearAuthentication(true).permitAll()
         ;
-        for (SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> c : securityWorkbin.defaultCodeSecurityConfigs()) {
+        List<SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity>> securityConfigs = securityWorkbin.grantTypeAuthenticationFactory().getSecurityConfigs();
+        for (SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> c : securityConfigs) {
             http.apply(c);
         }
         //这里引入扩展登陆的配置

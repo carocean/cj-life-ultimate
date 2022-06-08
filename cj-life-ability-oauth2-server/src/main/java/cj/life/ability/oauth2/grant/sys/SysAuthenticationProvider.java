@@ -12,7 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-@Component
 public class SysAuthenticationProvider implements AuthenticationProvider, InitializingBean {
 
     private final PasswordEncoder passwordEncoder;

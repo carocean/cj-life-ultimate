@@ -1,6 +1,8 @@
 package cj.life.ability.oauth2.filter;
 
-import org.springframework.lang.Nullable;
+import cj.life.ability.oauth2.grant.IGrantTypeAuthenticationFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,6 +19,9 @@ import java.io.IOException;
 public class LifeAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
     private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REQUEST_MATCHER = new AntPathRequestMatcher("/login", "POST");
     private boolean postOnly = true;
+    @Autowired
+    IGrantTypeAuthenticationFactory factory;
+
     public LifeAuthenticationFilter() {
         super(DEFAULT_ANT_PATH_REQUEST_MATCHER);
     }
@@ -30,12 +35,17 @@ public class LifeAuthenticationFilter extends AbstractAuthenticationProcessingFi
         if (this.postOnly && !request.getMethod().equals("POST")) {
             throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
         }
-        String username = request.getParameter("username");
-        username = username != null ? username : "";
-        username = username.trim();
-        String password = request.getParameter("password");
-        password = password != null ? password : "";
-        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username, password);
+
+        AbstractAuthenticationToken authRequest = factory.extractAuthenticationToken(request);
+        if (authRequest == null) {
+            //默认系统的认证逻辑
+            String username = request.getParameter("username");
+            username = username != null ? username : "";
+            username = username.trim();
+            String password = request.getParameter("password");
+            password = password != null ? password : "";
+            authRequest = new UsernamePasswordAuthenticationToken(username, password);
+        }
         authRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
         return this.getAuthenticationManager().authenticate(authRequest);
     }

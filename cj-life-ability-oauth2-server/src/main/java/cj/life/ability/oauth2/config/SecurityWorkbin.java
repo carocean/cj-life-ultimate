@@ -7,6 +7,9 @@ import cj.life.ability.oauth2.common.ResultCodeTranslator;
 import cj.life.ability.oauth2.example.ExampleClientDetailsService;
 import cj.life.ability.oauth2.example.ExampleUserDetailsService;
 import cj.life.ability.oauth2.filter.LifeAuthenticationFilter;
+import cj.life.ability.oauth2.grant.GrantTypeAuthenticationFactory;
+import cj.life.ability.oauth2.grant.IGrantTypeAuthenticationFactory;
+import cj.life.ability.oauth2.grant.IGrantTypeCombin;
 import cj.life.ability.oauth2.grant.mobile.SmsCodeSecurityConfig;
 import cj.life.ability.oauth2.grant.mobile.SmsCodeTokenGranter;
 import cj.life.ability.oauth2.grant.sys.SysSecurityConfig;
@@ -44,6 +47,7 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @EnableConfigurationProperties(SecurityProperties.class)
 public abstract class SecurityWorkbin {
@@ -125,24 +129,30 @@ public abstract class SecurityWorkbin {
     }
 
     @Bean
-    public List<SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity>> defaultCodeSecurityConfigs() {
-        SmsCodeSecurityConfig smsCodeSecurityConfig = applicationContext.getBean(SmsCodeSecurityConfig.class);
-        SysSecurityConfig sysSecurityConfig = applicationContext.getBean(SysSecurityConfig.class);
-        TenantSecurityConfig tenantSecurityConfig = applicationContext.getBean(TenantSecurityConfig.class);
-        return Arrays.asList(
-                smsCodeSecurityConfig,
-                sysSecurityConfig,
-                tenantSecurityConfig
-        );
+    public IGrantTypeAuthenticationFactory grantTypeAuthenticationFactory() {
+        Map<String,IGrantTypeCombin> combins=  applicationContext.getBeansOfType(IGrantTypeCombin.class);
+        return new GrantTypeAuthenticationFactory(combins);
     }
-
-    @Bean
-    public List<AbstractTokenGranter> defaultTokenGranters(AuthenticationManager authenticationManager, AuthorizationServerEndpointsConfigurer endpoints) {
-        return Arrays.asList(
-                new SmsCodeTokenGranter(authenticationManager, endpoints.getTokenServices(), endpoints.getClientDetailsService(), endpoints.getOAuth2RequestFactory()),
-                new TenantTokenGranter(authenticationManager, endpoints.getTokenServices(), endpoints.getClientDetailsService(), endpoints.getOAuth2RequestFactory())
-        );
-    }
+//
+//    @Bean
+//    public List<SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity>> defaultCodeSecurityConfigs() {
+//        SmsCodeSecurityConfig smsCodeSecurityConfig = applicationContext.getBean(SmsCodeSecurityConfig.class);
+//        SysSecurityConfig sysSecurityConfig = applicationContext.getBean(SysSecurityConfig.class);
+//        TenantSecurityConfig tenantSecurityConfig = applicationContext.getBean(TenantSecurityConfig.class);
+//        return Arrays.asList(
+//                smsCodeSecurityConfig,
+//                sysSecurityConfig,
+//                tenantSecurityConfig
+//        );
+//    }
+//
+//    @Bean
+//    public List<AbstractTokenGranter> defaultTokenGranters(AuthenticationManager authenticationManager, AuthorizationServerEndpointsConfigurer endpoints) {
+//        return Arrays.asList(
+//                new SmsCodeTokenGranter(authenticationManager, endpoints.getTokenServices(), endpoints.getClientDetailsService(), endpoints.getOAuth2RequestFactory()),
+//                new TenantTokenGranter(authenticationManager, endpoints.getTokenServices(), endpoints.getClientDetailsService(), endpoints.getOAuth2RequestFactory())
+//        );
+//    }
 
     @Bean
     public AbstractAuthenticationProcessingFilter defaultAuthenticationProcessingFilter(AuthenticationManager authenticationManager) {
