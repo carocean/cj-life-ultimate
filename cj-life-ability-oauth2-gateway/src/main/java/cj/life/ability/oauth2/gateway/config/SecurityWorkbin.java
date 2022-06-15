@@ -13,6 +13,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -124,8 +125,9 @@ public abstract class SecurityWorkbin {
         ServerBearerTokenAuthenticationConverter tokenAuthenticationConverter = new ServerBearerTokenAuthenticationConverter();
         tokenAuthenticationConverter.setAllowUriQueryParameter(true);
         //oauth2认证过滤器
-        AuthenticationWebFilter oauth2Filter = new AuthenticationWebFilter(customAuthenticationManager);
+        CustomAuthenticationWebFilter oauth2Filter = new CustomAuthenticationWebFilter(customAuthenticationManager);
         oauth2Filter.setServerAuthenticationConverter(tokenAuthenticationConverter);
+        oauth2Filter.setServerAuthenticationFailureHandler(new Oauth2ExceptionHandler());
         oauth2Filter.setAuthenticationFailureHandler(new ServerAuthenticationEntryPointFailureHandler(entryPoint));
         oauth2Filter.setAuthenticationSuccessHandler(new Oauth2AuthSuccessHandler());
         return oauth2Filter;
