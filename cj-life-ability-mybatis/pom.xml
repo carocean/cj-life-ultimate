@@ -32,8 +32,9 @@
             <artifactId>mybatis-spring-boot-starter</artifactId>
             <version>${spring.mybatis.version}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.alibaba/druid -->
         <dependency>
-            <groupId>com.alibaba111.alibaba</groupId>
+            <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
             <version>${com.alibaba111.alibaba.version}</version>
         </dependency>
