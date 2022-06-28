@@ -26,6 +26,11 @@ import java.util.Map;
  */
 //y认证成功之后走这个
 public class Oauth2AuthSuccessHandler implements ServerAuthenticationSuccessHandler {
+    ITenantStore tenantStore;
+    public Oauth2AuthSuccessHandler(ITenantStore tenantStore) {
+        this.tenantStore=tenantStore;
+    }
+
     @Override
     public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange, Authentication authentication) {
 //        ServerHttpRequest request = webFilterExchange.getExchange().getRequest();
@@ -47,6 +52,9 @@ public class Oauth2AuthSuccessHandler implements ServerAuthenticationSuccessHand
         //从认证服务器过来，如果认证服务器通过了租户认证则会有details
         Map<String, Object> details = (Map<String, Object>) authentication.getDetails();
         String tenantid = details == null ? "" : (String) details.getOrDefault("tenantid", "");
+        if (!StringUtils.hasText(tenantid)) {
+            tenantid = tenantStore.readTenantId(x_principal,clientId);
+        }
         headerValues.set("x-tenantid", tenantid);
 
         String roles = "";

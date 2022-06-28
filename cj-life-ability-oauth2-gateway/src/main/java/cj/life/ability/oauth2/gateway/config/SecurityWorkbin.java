@@ -117,7 +117,7 @@ public abstract class SecurityWorkbin {
     }
 
     @Bean("customAuthenticationWebFilter")
-    public AuthenticationWebFilter authenticationWebFilter(TokenStore tokenStore) {
+    public AuthenticationWebFilter authenticationWebFilter(TokenStore tokenStore,ITenantStore tenantStore) {
         //认证处理器
         ReactiveAuthenticationManager customAuthenticationManager = new CustomAuthenticationManager(tokenStore);
         JsonAuthenticationEntryPoint entryPoint = new JsonAuthenticationEntryPoint();
@@ -129,7 +129,7 @@ public abstract class SecurityWorkbin {
         oauth2Filter.setServerAuthenticationConverter(tokenAuthenticationConverter);
         oauth2Filter.setServerAuthenticationFailureHandler(new Oauth2ExceptionHandler());
         oauth2Filter.setAuthenticationFailureHandler(new ServerAuthenticationEntryPointFailureHandler(entryPoint));
-        oauth2Filter.setAuthenticationSuccessHandler(new Oauth2AuthSuccessHandler());
+        oauth2Filter.setAuthenticationSuccessHandler(new Oauth2AuthSuccessHandler(tenantStore));
         return oauth2Filter;
     }
 }
