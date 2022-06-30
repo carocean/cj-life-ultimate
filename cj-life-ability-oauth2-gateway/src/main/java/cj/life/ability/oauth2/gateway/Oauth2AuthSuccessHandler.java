@@ -53,7 +53,8 @@ public class Oauth2AuthSuccessHandler implements ServerAuthenticationSuccessHand
         Map<String, Object> details = (Map<String, Object>) authentication.getDetails();
         String tenantid = details == null ? "" : (String) details.getOrDefault("tenantid", "");
         if (!StringUtils.hasText(tenantid)) {
-            tenantid = tenantStore.readTenantId(x_principal,clientId);
+            String platformClientId = "platform";
+            tenantid = tenantStore.readTenantId(x_principal,platformClientId);
         }
         headerValues.set("x-tenantid", tenantid);
 

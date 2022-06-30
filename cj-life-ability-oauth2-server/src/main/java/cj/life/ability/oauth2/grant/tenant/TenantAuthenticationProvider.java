@@ -1,8 +1,6 @@
 package cj.life.ability.oauth2.grant.tenant;
 
 import cj.life.ability.oauth2.redis.ITenantStore;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.codec.digest.Md5Crypt;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
@@ -11,9 +9,6 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.TokenStore;
-import sun.security.provider.MD5;
-
-import java.util.Map;
 
 public class TenantAuthenticationProvider implements AuthenticationProvider {
     TokenStore tokenStore;
@@ -41,10 +36,7 @@ public class TenantAuthenticationProvider implements AuthenticationProvider {
             throw new InvalidTokenException(access_token);
         }
 //        tokenStore.storeAccessToken(oAuth2AccessToken, exists);
-        String client_id = "";
-        if (storedAuth.getUserAuthentication() != null) {
-            client_id = (String) ((Map<String, Object>) storedAuth.getUserAuthentication().getDetails()).get("client_id");
-        }
+        String client_id = storedAuth.getOAuth2Request().getClientId();
 //        String tenantKey = DigestUtils.md5Hex(String.format("%s%s",storedAuth.getName(),client_id));
         tenantStore.storeTenant(storedAuth.getName(),client_id,(String)tenantAuthenticationToken.getPrincipal());
         //虽然在以上过程只是重新读了一遍，检查这个用户登录过之后，
