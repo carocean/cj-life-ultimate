@@ -27,6 +27,10 @@
             <version>${cj-life-ability-oauth2-common.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        <dependency>
             <groupId>cj.life</groupId>
             <artifactId>cj-life-ability-redis</artifactId>
             <version>${cj-life-ability-redis.version}</version>
