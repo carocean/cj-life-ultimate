@@ -10,5 +10,5 @@ import java.lang.annotation.*;
 @ComponentScan(basePackages = {"cj.life.ability.swagger"})
 //@Import({Swagger3Config.class, FixNpeForSpringfoxHandlerProviderBeanPostProcessorConfiguration.class})
 //@ConditionalOnWebApplication
-public @interface EnableSwagger {
+public @interface EnableCjSwagger {
 }

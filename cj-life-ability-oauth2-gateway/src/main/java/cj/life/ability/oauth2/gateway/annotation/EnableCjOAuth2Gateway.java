@@ -11,5 +11,5 @@ import java.lang.annotation.*;
 @Documented
 @Import({ResourceServerConfig.class, DefaultTokenResource.class})
 //@ConditionalOnWebApplication
-public @interface EnableOAuth2Gateway {
+public @interface EnableCjOAuth2Gateway {
 }

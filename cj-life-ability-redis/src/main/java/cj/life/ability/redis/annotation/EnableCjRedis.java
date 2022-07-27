@@ -1,7 +1,6 @@
 package cj.life.ability.redis.annotation;
 
 import cj.life.ability.redis.config.RedisConfig;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -11,5 +10,5 @@ import java.lang.annotation.*;
 @Documented
 @Import({RedisConfig.class})
 //@ConditionalOnWebApplication
-public @interface EnableRedis {
+public @interface EnableCjRedis {
 }
