@@ -48,7 +48,8 @@ public class FeignConfiguration {
         @Override
         public List<MethodMetadata> parseAndValidateMetadata(Class<?> targetType) {
             Util.checkState(targetType.getTypeParameters().length == 0, "Parameterized types unsupported: %s", new Object[]{targetType.getSimpleName()});
-            Util.checkState(targetType.getInterfaces().length <= 1, "Only single inheritance supported: %s", new Object[]{targetType.getSimpleName()});
+            //充许feign继承多个接口，但父接口最好不要包含RequestMapping注解
+            //            Util.checkState(targetType.getInterfaces().length <= 1, "Only single inheritance supported: %s", new Object[]{targetType.getSimpleName()});
             Map<String, MethodMetadata> result = new LinkedHashMap();
             Method[] methods = targetType.getMethods();
             int length = methods.length;
