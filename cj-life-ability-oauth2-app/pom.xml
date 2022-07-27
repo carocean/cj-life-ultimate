@@ -25,6 +25,11 @@
         </dependency>
         <dependency>
             <groupId>cj.life</groupId>
+            <artifactId>cj-life-ability-swagger</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>cj.life</groupId>
             <artifactId>cj-life-ability-oauth2-common</artifactId>
             <version>0.0.1</version>
         </dependency>
