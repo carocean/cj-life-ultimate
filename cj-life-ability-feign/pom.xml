@@ -9,7 +9,6 @@
         <version>0.0.1</version>
         <!--        <relativePath/> &lt;!&ndash; lookup parent from repository &ndash;&gt;-->
     </parent>
-    <groupId>cj.life</groupId>
     <artifactId>cj-life-ability-feign</artifactId>
     <name>cj-life-ability-feign</name>
     <description>cj-life-ability-feign</description>

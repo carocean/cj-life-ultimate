@@ -9,7 +9,6 @@
 		<version>0.0.1</version>
 		<!--        <relativePath/> &lt;!&ndash; lookup parent from repository &ndash;&gt;-->
 	</parent>
-	<groupId>cj.life.ability</groupId>
 	<artifactId>cj-life-ability-config</artifactId>
 	<packaging>pom</packaging>
 	<name>cj-life-ability-config</name>
