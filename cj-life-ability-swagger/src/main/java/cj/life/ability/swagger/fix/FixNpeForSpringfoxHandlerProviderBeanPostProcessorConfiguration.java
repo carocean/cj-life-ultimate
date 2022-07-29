@@ -1,4 +1,4 @@
-package cj.life.ability.oauth2.app.fix;
+package cj.life.ability.swagger.fix;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
