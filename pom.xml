@@ -35,6 +35,7 @@
     </profiles>
     <modules>
         <module>cj-life-ability-banner</module>
+        <module>cj-life-ability-config</module>
         <module>cj-life-ability-mybatis</module>
         <module>cj-life-ability-util</module>
         <module>cj-life-ability-api</module>
