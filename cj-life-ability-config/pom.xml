@@ -10,8 +10,8 @@
 		<!--        <relativePath/> &lt;!&ndash; lookup parent from repository &ndash;&gt;-->
 	</parent>
 	<artifactId>cj-life-ability-config</artifactId>
-	<packaging>pom</packaging>
 	<name>cj-life-ability-config</name>
+	<packaging>pom</packaging>
 	<description>cj-life-ability-config</description>
 	<properties>
 		<java.version>1.8</java.version>
@@ -24,6 +24,10 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 	</dependencies>
 
