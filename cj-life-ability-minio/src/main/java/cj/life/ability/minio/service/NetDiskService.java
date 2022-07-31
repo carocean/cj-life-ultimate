@@ -8,6 +8,7 @@ import io.minio.errors.ErrorResponseException;
 import io.minio.http.Method;
 import io.minio.messages.Item;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +23,10 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class NetDiskService implements INetDiskService {
+    @Value("${minio.endpoint}")
+    private String endpoint;
+    @Value("${minio.openEndpoint}")
+    private String openEndpoint;
     @Resource
     MinioClient minioClient;
 
@@ -355,19 +360,27 @@ public class NetDiskService implements INetDiskService {
         if ("".equals(objectName)) {
             throw new ApiException("4005", "The path is empty.");
         }
+        String url = "";
         if (expirySeconds < 0) {
-            return minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs
+            url= minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs
                     .builder()
                     .method(Method.GET)
                     .bucket(filePath.getBucketName())
                     .object(objectName)
                     .build());
+        }else{
+            url= minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs
+                    .builder()
+                    .method(Method.GET)
+                    .bucket(filePath.getBucketName())
+                    .object(objectName).expiry(expirySeconds, TimeUnit.SECONDS) //预览可用时间
+                    .build());
         }
-        return minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs
-                .builder()
-                .method(Method.GET)
-                .bucket(filePath.getBucketName())
-                .object(objectName).expiry(expirySeconds, TimeUnit.SECONDS) //预览可用时间
-                .build());
+        if (!StringUtils.hasText(openEndpoint)) {
+            return url;
+        }
+        url = url.substring(endpoint.length());
+        url = String.format("%s%s", openEndpoint, url);
+        return url;
     }
 }

@@ -34,6 +34,7 @@ public class MinIoClientConfig {
     }
 
     @Bean
+    @RefreshScope
     public INetDiskService netDiskService() {
         return new NetDiskService();
     }
