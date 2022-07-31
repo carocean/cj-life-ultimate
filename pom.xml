@@ -11,12 +11,12 @@
     <groupId>cj.life</groupId>
     <artifactId>cj-life-ultimate</artifactId>
     <packaging>pom</packaging>
-    <version>${project.version}</version>
+    <version>${cj.life.ability.project.version}</version>
     <name>cj-life-ultimate</name>
     <description>cj-life-ultimate</description>
     <properties>
         <java.version>1.8</java.version>
-        <project.version>0.0.1-SNAPSHOT</project.version>
+        <cj.life.ability.project.version>0.0.1-SNAPSHOT</cj.life.ability.project.version>
         <io.swagger.swagger-annotations.version>1.5.14</io.swagger.swagger-annotations.version>
         <io.springfox.springfox-swagger2.version>2.6.1</io.springfox.springfox-swagger2.version>
         <io.springfox.springfox-swagger-ui.version>2.6.1</io.springfox.springfox-swagger-ui.version>
@@ -29,7 +29,7 @@
         <profile>
             <id>release</id>
             <properties>
-                <project.version>0.0.1</project.version>
+                <cj.life.ability.project.version>0.0.1</cj.life.ability.project.version>
             </properties>
         </profile>
     </profiles>
@@ -47,6 +47,7 @@
         <module>cj-life-ability-oauth2-common</module>
         <module>cj-life-ability-oauth2-gateway</module>
         <module>cj-life-ability-redis</module>
+        <module>cj-life-ability-minio</module>
     </modules>
     <dependencies>
         <dependency>
