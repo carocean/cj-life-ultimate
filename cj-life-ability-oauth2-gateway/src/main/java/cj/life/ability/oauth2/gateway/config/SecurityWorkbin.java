@@ -6,14 +6,12 @@ import cj.life.ability.oauth2.common.ResultCodeTranslator;
 import cj.life.ability.oauth2.gateway.*;
 import cj.life.ability.oauth2.gateway.client.DefaultLookupClient;
 import cj.life.ability.oauth2.gateway.properties.SecurityProperties;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
-import org.springframework.http.MediaType;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -36,7 +34,6 @@ import reactor.netty.ByteBufFlux;
 
 import javax.naming.AuthenticationException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 @EnableConfigurationProperties(SecurityProperties.class)
 public abstract class SecurityWorkbin {
@@ -64,8 +61,8 @@ public abstract class SecurityWorkbin {
 
     @Bean
     public TokenStore tokenStore() {
-        JedisConnectionFactory jedisConnectionFactory = applicationContext.getBean(JedisConnectionFactory.class);
-        return new RedisTokenStore(jedisConnectionFactory);
+        RedisConnectionFactory redisConnectionFactory = applicationContext.getBean(RedisConnectionFactory.class);
+        return new RedisTokenStore(redisConnectionFactory);
     }
 
     @Bean("customServerLogoutSuccessHandler")
@@ -117,7 +114,7 @@ public abstract class SecurityWorkbin {
     }
 
     @Bean("customAuthenticationWebFilter")
-    public AuthenticationWebFilter authenticationWebFilter(TokenStore tokenStore,ITenantStore tenantStore) {
+    public AuthenticationWebFilter authenticationWebFilter(TokenStore tokenStore, ITenantStore tenantStore) {
         //认证处理器
         ReactiveAuthenticationManager customAuthenticationManager = new CustomAuthenticationManager(tokenStore);
         JsonAuthenticationEntryPoint entryPoint = new JsonAuthenticationEntryPoint();

@@ -2,7 +2,10 @@ package cj.life.ability.oauth2.config;
 
 import cj.life.ability.api.R;
 import cj.life.ability.api.ResultCode;
-import cj.life.ability.oauth2.*;
+import cj.life.ability.oauth2.DefaultFailureAuthentication;
+import cj.life.ability.oauth2.DefaultLogoutSuccessHandler;
+import cj.life.ability.oauth2.DefaultSuccessAuthentication;
+import cj.life.ability.oauth2.DefaultUnauthorizedEntryPoint;
 import cj.life.ability.oauth2.common.ResultCodeTranslator;
 import cj.life.ability.oauth2.example.ExampleClientDetailsService;
 import cj.life.ability.oauth2.example.ExampleUserDetailsService;
@@ -10,11 +13,6 @@ import cj.life.ability.oauth2.filter.LifeAuthenticationFilter;
 import cj.life.ability.oauth2.grant.GrantTypeAuthenticationFactory;
 import cj.life.ability.oauth2.grant.IGrantTypeAuthenticationFactory;
 import cj.life.ability.oauth2.grant.IGrantTypeCombin;
-import cj.life.ability.oauth2.grant.mobile.SmsCodeSecurityConfig;
-import cj.life.ability.oauth2.grant.mobile.SmsCodeTokenGranter;
-import cj.life.ability.oauth2.grant.sys.SysSecurityConfig;
-import cj.life.ability.oauth2.grant.tenant.TenantSecurityConfig;
-import cj.life.ability.oauth2.grant.tenant.TenantTokenGranter;
 import cj.life.ability.oauth2.properties.SecurityProperties;
 import cj.life.ability.oauth2.redis.RedisAuthCodeStoreServices;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -23,30 +21,25 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
-import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.error.WebResponseExceptionTranslator;
-import org.springframework.security.oauth2.provider.token.AbstractTokenGranter;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.DefaultSecurityFilterChain;
-import org.springframework.security.web.authentication.*;
+import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 @EnableConfigurationProperties(SecurityProperties.class)
@@ -63,8 +56,8 @@ public abstract class SecurityWorkbin {
 
     @Bean
     public TokenStore tokenStore() {
-        JedisConnectionFactory jedisConnectionFactory = applicationContext.getBean(JedisConnectionFactory.class);
-        return new RedisTokenStore(jedisConnectionFactory);
+        RedisConnectionFactory redisConnectionFactory = applicationContext.getBean(RedisConnectionFactory.class);
+        return new RedisTokenStore(redisConnectionFactory);
     }
 
     @Bean("customClientDetailsService")
@@ -130,7 +123,7 @@ public abstract class SecurityWorkbin {
 
     @Bean
     public IGrantTypeAuthenticationFactory grantTypeAuthenticationFactory() {
-        Map<String,IGrantTypeCombin> combins=  applicationContext.getBeansOfType(IGrantTypeCombin.class);
+        Map<String, IGrantTypeCombin> combins = applicationContext.getBeansOfType(IGrantTypeCombin.class);
         return new GrantTypeAuthenticationFactory(combins);
     }
 //
