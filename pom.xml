@@ -48,6 +48,7 @@
         <module>cj-life-ability-oauth2-gateway</module>
         <module>cj-life-ability-redis</module>
         <module>cj-life-ability-minio</module>
+        <module>cj-life-ability-elasticsearch</module>
     </modules>
     <dependencies>
         <dependency>
