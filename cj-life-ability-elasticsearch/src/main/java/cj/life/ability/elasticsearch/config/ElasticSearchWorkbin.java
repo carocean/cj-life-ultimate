@@ -1,5 +1,6 @@
 package cj.life.ability.elasticsearch.config;
 
+import cj.life.ability.elasticsearch.ElasticProperties;
 import lombok.SneakyThrows;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
@@ -42,7 +43,7 @@ public class ElasticSearchWorkbin {
         SSLContextBuilder sslBuilder = SSLContexts.custom()
                 .loadTrustMaterial(null, (x509Certificates, s) -> true);
         final SSLContext sslContext = sslBuilder.build();
-        List<String> uris = properties.uris;
+        List<String> uris = properties.getUris();
         HttpHost[] httpHosts = new HttpHost[uris.size()];
         for (int i = 0; i < uris.size(); i++) {
             String url = uris.get(i);
@@ -69,8 +70,8 @@ public class ElasticSearchWorkbin {
                     @Override
                     public RequestConfig.Builder customizeRequestConfig(
                             RequestConfig.Builder requestConfigBuilder) {
-                        return requestConfigBuilder.setConnectTimeout(properties.connectionTimeout)
-                                .setSocketTimeout(properties.socketTimeout);
+                        return requestConfigBuilder.setConnectTimeout(properties.getConnectionTimeout())
+                                .setSocketTimeout(properties.getSocketTimeout());
                     }
                 }));
         return client;

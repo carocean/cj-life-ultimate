@@ -1,4 +1,4 @@
-package cj.life.ability.elasticsearch.config;
+package cj.life.ability.elasticsearch;
 
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
